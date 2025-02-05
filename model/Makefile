@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := PhysiBoSS_Cell_Lines
+PROGRAM_NAME := invasion_model
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -58,7 +58,9 @@ ARCH := native # best auto-tuning
 # ARCH := nocona #64-bit pentium 4 or later 
 
 # CFLAGS := -march=$(ARCH) -Ofast -s -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
-CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
+CFLAGS := -g -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
+# debug:
+# CFLAGS := -march=$(ARCH) -O0 -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
 
 ifeq ($(OS),Windows_NT)
 else
@@ -83,21 +85,23 @@ PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o Physi
 PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o PhysiCell_basic_signaling.o \
 PhysiCell_signal_behavior.o PhysiCell_rules.o
 
+
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
-# put your custom objects here (they should be in the custom_modules directory)  
+# put your custom objects here (they should be in the custom_modules directory)
+
 MaBoSS := ./addons/PhysiBoSS/MaBoSS/engine/src/BooleanNetwork.h
 
 PhysiBoSS_OBJECTS := maboss_network.o maboss_intracellular.o
 
-PhysiCell_custom_module_OBJECTS := custom.o 
+PhysiCell_custom_module_OBJECTS := custom.o
 
 pugixml_OBJECTS := pugixml.o
 
-start_and_stop_OBJECTS := start_and_stop.o
-
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
+
+start_and_stop_OBJECTS := start_and_stop.o
 ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSS_OBJECTS) $(start_and_stop_OBJECTS)
 
 # compile the project 
@@ -145,7 +149,7 @@ PhysiCell_signal_behavior.o: ./core/PhysiCell_signal_behavior.cpp
 
 PhysiCell_rules.o: ./core/PhysiCell_rules.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_rules.cpp 
-
+	
 # BioFVM core components (needed by PhysiCell)
 	
 BioFVM_vector.o: ./BioFVM/BioFVM_vector.cpp
@@ -191,7 +195,7 @@ PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp $(MaBoSS)
 
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
-
+	
 PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
 	
@@ -199,17 +203,17 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
 	
 PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 	
 	
 PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 	
 
 # start_and_stop
 start_and_stop.o: ./addons/start_and_stop/start_and_stop.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/start_and_stop/start_and_stop.cpp
+	
 
 # user-defined PhysiCell modules
-
 Compile_MaBoSS: ./addons/PhysiBoSS/MaBoSS/engine/src/BooleanNetwork.h
 	cd ./addons/PhysiBoSS/MaBoSS/engine/src;make CXX=$(CC) MAXNODES=$(MABOSS_MAX_NODES) install_alib;make clean; cd ../../../../..
 
@@ -227,7 +231,7 @@ maboss_intracellular.o: ./addons/PhysiBoSS/src/maboss_intracellular.cpp $(MaBoSS
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSS/src/maboss_intracellular.cpp
 
 custom.o: ./custom_modules/custom.cpp $(MaBoSS)
-	$(COMPILE_COMMAND) $(INC)  -c ./custom_modules/custom.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom.cpp
 
 # cleanup
 
@@ -237,10 +241,10 @@ reset:
 	rm -f ./custom_modules/*
 	touch ./custom_modules/empty.txt 
 	touch ALL_CITATIONS.txt 
-	touch ./core/PhysiCell_cell.cpp
 	rm ALL_CITATIONS.txt 
+	rm ./config/PhysiCell_settings_*.xml
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
-	rm -rf ./config/model_*.bnd ./config/model.cfg ./config/cells.csv
+	rm -rf ./config/boolean_network/ ./config/cells.csv ./config/rules.csv ./config/init.tsv
 	rm -rf ./scripts
 
 MaBoSS-clean:
@@ -254,7 +258,8 @@ data-cleanup:
 	rm -f *.mat
 	rm -f *.xml
 	rm -f *.svg
-	rm -f ./output/*
+	rm -rf ./output
+	mkdir ./output
 	touch ./output/empty.txt
 	
 # archival 

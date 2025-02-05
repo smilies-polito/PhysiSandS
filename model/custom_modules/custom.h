@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -64,30 +64,41 @@
 #                                                                             #
 ###############################################################################
 */
-#ifndef __Custom_h__
-#define __Custom_h__
 
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 
-#include "../addons/start_and_stop/start_and_stop.h"
-
 using namespace BioFVM; 
 using namespace PhysiCell;
+#include "custom_main.h"
 
 // setup functions to help us along 
+
 void create_cell_types( void );
 void setup_tissue( void ); 
 
 // set up the BioFVM microenvironment 
 void setup_microenvironment( void ); 
-// custom pathology coloring function 
 
-std::vector<std::string> my_coloring_function( Cell* );
+// custom functions can go here 
 
-// custom cell phenotype functions could go here 
-void pre_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt );
-void post_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt );
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
+void set_substrate_density(int density_index, double max, double min);
+
+/** \brief Get the current value of integrin strength */
+inline double get_integrin_strength( double percent )
+{ return current_value( PhysiCell::parameters.doubles("ecm_adhesion_min"), PhysiCell::parameters.doubles("ecm_adhesion_max"), percent ); };
+
+/** \brief Get the current value of motility coefficient */
+inline double get_motility_amplitude( double percent )
+{ return current_value(PhysiCell::parameters.doubles("motility_amplitude_min"), PhysiCell::parameters.doubles("motility_amplitude_max"), percent ); };
+
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
+
+void add_ecm_interaction( Cell* pCell, int index_ecm, int index_voxel );
+void pre_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt);
+void post_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt);
+
+std::string my_coloring_function_for_stroma( double concentration, double max_conc, double min_conc );
 void color_node(Cell* pCell);
-
-#endif

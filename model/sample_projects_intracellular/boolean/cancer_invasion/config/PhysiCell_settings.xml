@@ -670,6 +670,8 @@
     </initial_conditions>
 
     <user_parameters>
+    	<start_stop type="bool" units="">false</start_stop>
+
         <random_seed type="int" units="dimensionless" description="">0</random_seed>
         <tumor_radius type="double" units="micron" description="">30.0</tumor_radius>
         <config_radius type="double" units="" description="change the initial radius of the tumor">30</config_radius>

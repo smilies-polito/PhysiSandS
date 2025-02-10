@@ -664,13 +664,13 @@
 
     <initial_conditions>
         <cell_positions enabled="true" type="csv">
-            <folder>./config</folder>
+            <folder>./start_and_stop_saving_files</folder>
             <filename>cells.csv</filename>
         </cell_positions>
     </initial_conditions>
 
     <user_parameters>
-    	<start_stop type="bool" units="">false</start_stop>
+    	<start_stop type="bool" units="">true</start_stop>
 
         <random_seed type="int" units="dimensionless" description="">0</random_seed>
         <tumor_radius type="double" units="micron" description="">30.0</tumor_radius>

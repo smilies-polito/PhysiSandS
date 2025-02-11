@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from pctk import multicellds
+from utils.multicellDS_second import MultiCellDS_second
 sys.path.append('../')
 
 
@@ -37,6 +38,7 @@ class interface:
             self.parameter_dict['use_2D']['value'] = 'false'
 
         self.output_folder = os.path.join(self.PhysiBoSS_dir, 'output')
+        self.Start_Stop_folder = os.path.join(self.PhysiBoSS_dir, 'start_and_stop_saving_files')
 
     def update_parameters(self, iteration):
         
@@ -45,9 +47,54 @@ class interface:
             physicell_setting_file = os.path.join(self.root_dir, 'model/sample_projects_intracellular/boolean/spheroid_tnf_model/config/PhysiCell_settings.xml')
         else:
             physicell_setting_file = os.path.join(self.root_dir, 'model/config/PhysiCell_settings.xml')
+        
+        # Upload XML file
+        tree = ET.parse(physicell_setting_file)
+        root = tree.getroot()
+        
+        # Extract list of parameters to update
+        parameters = list(self.parameter_dict.keys())
+        
+        for param in parameters:
+            # Find parameter tags
+            tags = self.parameter_dict[param]['path'].split('/')
+            
+            # Find tag to modify
+            element = root
+            for tag in tags:
+                if element is not None:
+                    if tag == 'variable' and 'name' in self.parameter_dict[param]:
+                        # Find the variable with the specific name
+                        found = False
+                        for var in element.findall(tag):
+                            if var.attrib['name'] == self.parameter_dict[param]['name']:
+                                element = var
+                                found = True
+                                break
+                        if not found:
+                            element = None
+                            break
+                    elif tag != 'variable':
+                        element = element.find(tag)
+                
+            #Update the value
+            new_value = str(self.parameter_dict[param]['value'])
 
-        # Path for the directory with the saving of old simulation
-        old_simu_path = os.path.join(self.root_dir, 'model/starting_file_trial')
+            if element is not None:
+                element.text = new_value
+
+            # Save XML file
+            tree.write(physicell_setting_file)
+            
+        return 'Settings updated succesfully!'
+
+    def update_parameters_second(self, iteration):
+        
+        # File path for the physicell settings
+        if iteration == 0:
+            physicell_setting_file = os.path.join(self.root_dir, 'model/sample_projects_intracellular/boolean/cancer_invasion/config/PhysiCell_settings.xml')
+        else:
+            physicell_setting_file = os.path.join(self.root_dir, 'model/config/PhysiCell_settings.xml')
         
         # Upload XML file
         tree = ET.parse(physicell_setting_file)
@@ -119,6 +166,37 @@ class interface:
         subprocess.run(execute_command, check=True) 
         
         return self.output_folder
+
+    def execute_simulation_second(self, iteration):
+        # Change current working directory
+        os.chdir(self.PhysiBoSS_dir)
+        
+        # Need to be updated but for now let's mantain this
+        executable_file = 'invasion_model'
+
+        if iteration == 0:
+
+            # Recreate output folder
+            first_make_command = ["make", 'data-cleanup']
+            subprocess.run(first_make_command, check=True)
+
+            reset_make_command = ["make", 'reset']
+            subprocess.run(reset_make_command, check=True)
+            
+            clean_make_command = ["make", 'clean']
+            subprocess.run(clean_make_command, check=True)
+
+            make_command = ["make", "physiboss-tutorial-invasion"]
+            subprocess.run(make_command, check=True)
+        
+            make_command = ["make"]
+            subprocess.run(make_command, check=True)
+        
+        # Run the simulation
+        execute_command = ["./" + executable_file]
+        subprocess.run(execute_command, check=True) 
+        
+        return self.output_folder
     
     def alive_cells(self):
         # Creating a MCDS reader
@@ -147,6 +225,39 @@ class interface:
 
         
         return time_steps, step_alive, step_apoptotic, step_necrotic, pos
+
+    def alive_cells_second(self):
+
+        type_mapping = {
+            0: "Epithelial",
+            1: "Mesenchymal",
+        }
+
+        # Creazione del lettore MCDS
+        reader = MultiCellDS_second(output_folder=self.output_folder)
+
+        # Iteratore per caricare i dati delle cellule ad ogni timestep
+        df_iterator = reader.cells_as_frames_iterator()
+
+        # Creiamo una cartella per salvare le immagini
+        output_images_folder = os.path.join(self.output_folder, "cell_plots")
+        os.makedirs(output_images_folder, exist_ok=True)
+
+        step_epithelial = []
+        step_mesenchymal = []
+        time_steps = []
+
+        for (t, df_cells) in df_iterator:
+            cell_types = df_cells["cell_type"]
+
+            epithelial = (cell_types == 0).sum()
+            mesenchymal = (cell_types == 1).sum()
+
+            step_epithelial.append(epithelial)
+            step_mesenchymal.append(mesenchymal)
+            time_steps.append(t)
+
+        return time_steps, step_epithelial, step_mesenchymal
 
 
     def plot(self, time_steps, step_alive, step_necrotic, step_apoptotic, pos, resistance=False, stop_time=None, stop=False):
@@ -185,6 +296,39 @@ class interface:
         ax.grid(True)
 
         plt.savefig(os.path.join(self.output_folder, 'cell_population_over_time.pdf'))
+
+    def plot_second(self, time_steps, epithelial_step, mesenchymal_step, stop_time=None):
+        # Use Set1 colormap for colors
+        cmap = plt.get_cmap('Set1')
+        color_epithelial = 'red'  # Epithelial Cells
+        color_mesenchymal = 'green'  # Mesenchymal Cells
+
+        # Plotting the data
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        # Create stackplot for epithelial and mesenchymal cells only
+        ax.stackplot(
+            time_steps,
+            epithelial_step,
+            mesenchymal_step,
+            colors=[color_epithelial, color_mesenchymal],
+            labels=['Epithelial Cells', 'Mesenchymal Cells']
+        )
+
+        if stop_time is not None:
+            ax.axvline(x=stop_time, color='black', linestyle='--', label='Stop Time')
+
+        # Formatting
+        ax.set_xlabel('Time (min)', fontsize=14)
+        ax.set_ylabel('Number of Cells', fontsize=14)
+        ax.set_title('Epithelial vs. Mesenchymal Cell Population Over Time', fontsize=16)
+        ax.tick_params(axis='both', which='major', labelsize=15)
+        ax.legend(fontsize=15)
+        ax.grid(True)
+
+        # Save the plot
+        plt.savefig(os.path.join(self.output_folder, 'epithelial_mesenchymal_population.pdf'))
+        plt.close()
     
     def resistance_detection(self, alive_cells):
 

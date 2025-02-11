@@ -1,0 +1,26 @@
+{
+    "z_min": {
+        "value": -500,
+        "path": "domain/z_min"
+    },
+    "z_max": {
+        "value": 500,
+        "path": "domain/z_max"
+    },
+    "use_2D": {
+        "value": "true",
+        "path": "domain/use_2D"
+    },
+    "max_time": {
+        "value": 2880,
+        "path": "overall/max_time"
+    },
+    "start_stop": {
+        "value": "false",
+        "path": "user_parameters/start_stop"
+    },
+    "initial_conditions": {
+        "value": "./config",
+        "path": "initial_conditions/cell_positions/folder"
+    }
+}

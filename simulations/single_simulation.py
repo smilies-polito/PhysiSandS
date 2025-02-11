@@ -31,10 +31,34 @@ def single_simu(two_D, resistance=False):
     
     return time_steps, step_alive, step_necrotic, step_apoptotic, pos, percentage_of_resistant, stable_cells
 
+def single_simu_second(two_D):
+    root_dir = os.getcwd()
+    json_file_path = os.path.join(root_dir, 'helpers/simulation_parameters/simulation_parameters_second.json')
+
+    # define interface object
+    my_interface = interface(root_dir, json_file_path, two_D)
+
+    # update_parameters
+    iteration = 0
+    
+    my_interface.update_parameters_second(iteration)
+
+    # Execute the simulation with new parameters
+
+    output_folder = my_interface.execute_simulation_second(iteration)
+
+    # Count alive cells for iteration and plot
+    time_steps, step_epithelial, step_mesenchymal = my_interface.alive_cells_second()
+
+    #print(len(time_steps))
+    # Execute plot
+    my_interface.plot_second(time_steps, step_epithelial, step_mesenchymal)
+    
+    return time_steps, step_epithelial, step_mesenchymal
+
 if __name__ == "__main__":
 
     os.chdir('..')
     two_D = True
-    time_steps, step_alive, step_necrotic, step_apoptotic, pos, percentage_of_resistant, stable_cells  = single_simu(two_D)
-    print(percentage_of_resistant)
-    print(stable_cells)
+    time_steps, step_epithelial, step_mesenchymal  = single_simu_second(two_D)
+    #single_simu(two_D)

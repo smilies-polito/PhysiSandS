@@ -111,17 +111,20 @@ def create_combined_boxplots(output_dir):
     
 def quantitative_test(output_dir):
     dir = os.getcwd()
-    os.chdir('..')
 
-    num_simu = 50
+    num_simu = 1
 
     step = 300
 
     two_D = True
 
+
     epithelial, mesenchymal, durations = test_single_simu_second(num_simu, step, two_D)
 
+    os.chdir(dir)
+
     epithelial_s_s, mesenchymal_s_s, durations_ss = test_start_and_stop_second(num_simu, step, two_D)
+
 
     data = {
         'epithelial': epithelial,

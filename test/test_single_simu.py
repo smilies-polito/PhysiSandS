@@ -112,7 +112,7 @@ def test_single_simu_second(num_simu, step, two_D, resistance=False):
             stops.append(duration)
 
     #modify the parameters according to the simulation we want to build
-
+    os.chdir('..')
     json_file_path = 'helpers/simulation_parameters/simulation_parameters_second.json'
     with open(json_file_path, 'r') as file:
         parameter_dict = json.load(file)
@@ -134,8 +134,6 @@ def test_single_simu_second(num_simu, step, two_D, resistance=False):
         data_to_plot_mesenchymal.append([])
 
     for sim in range(num_simu):
-        if sim != 0:
-            os.chdir('..')
         ini = time.process_time()
         time_steps_flag, step_epithelial_flag, step_mesenchymal_flag = single_simu_second(two_D)
         fin = time.process_time()

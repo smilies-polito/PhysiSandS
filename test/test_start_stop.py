@@ -102,6 +102,7 @@ def test_start_and_stop_second(num_simu, step, two_D):
         data_to_plot_mesenchymal.append([])
 
     for sim in range(num_simu):
+        os.chdir(current_dir)
 
         ini = time.process_time()
         time_steps_flag, step_epithelial_flag, step_mesenchymal_flag = start_stop_simu_second(step, two_D)

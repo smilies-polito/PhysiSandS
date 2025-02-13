@@ -14,7 +14,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">2880</max_time>
+        <max_time units="min">300</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -29,11 +29,11 @@
     <save>
         <folder>output</folder>
         <full_data>
-            <interval units="min">10</interval>
+            <interval units="min">30</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">10</interval>
+            <interval units="min">30</interval>
             <enable>true</enable>
             <legend enabled="true">
                 <cell_phase>false</cell_phase>

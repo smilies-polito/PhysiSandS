@@ -49,7 +49,7 @@ def create_combined_boxplots(output_dir):
     colors = ['red', 'green']
 
     # Define the x-axis values (time steps in minutes)
-    x_values = [300, 600, 900, 1200, 1500, 1800, 2100, 2400, 2700, 2880]
+    x_values = [600, 1200, 1800, 2400, 2880]
 
     # Create a figure and a set of subplots (one for each category)
     fig, axs = plt.subplots(2, 1, figsize=(5, 8))  # Reduced the size
@@ -66,8 +66,8 @@ def create_combined_boxplots(output_dir):
         data_s_s = eval(category.lower() + '_s_s')
 
         # Prepare the data to be plotted for both normal and start-stop simulations
-        data_to_plot_normal = [data_normal[j] for j in range(10)]
-        data_to_plot_s_s = [data_s_s[j] for j in range(10)]
+        data_to_plot_normal = [data_normal[j] for j in range(len(x_values))]
+        data_to_plot_s_s = [data_s_s[j] for j in range(len(x_values))]
 
         # Store the boxplot elements to use in the legend
         boxplot_elements = []

@@ -161,6 +161,7 @@ double UniformRandom( void )
 		}
 */
 	}
+	counter_double_random++;
     return distribution(physicell_PRNG_generator);
 
 	// helpful info: https://stackoverflow.com/a/29710970
@@ -176,6 +177,7 @@ double UniformRandom( void )
 
 int UniformInt()
 {
+	counter_int_random++;
 	static std::uniform_int_distribution<int> int_dis;
 	return int_dis(physicell_PRNG_generator);
 }
@@ -183,6 +185,7 @@ int UniformInt()
 
 double NormalRandom( double mean, double standard_deviation )
 {
+	counter_normal_random++;
 	std::normal_distribution<double> d(mean,standard_deviation);
 	return d(physicell_PRNG_generator); 
 }

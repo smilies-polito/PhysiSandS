@@ -182,6 +182,18 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		for (size_t i = 0; i < indicesOfOutputs.size(); ++i) {
 			out_stream << "Index_" << i << ": " << indicesOfOutputs[i] << std::endl;
 		}
+		out_stream << "listOfInputs_size: " << listOfInputs.size() << std::endl;
+		for (const auto& pair : listOfInputs) {
+			out_stream << pair.first << std::endl;
+			pair.second.save_maboss_input(out_stream);
+		}
+
+		out_stream << "listOfoUTPUTS_size: " << listOfOutputs.size() << std::endl;
+		for (const auto& pair : listOfOutputs) {
+			out_stream << pair.first << std::endl;
+			pair.second.save_maboss_output(out_stream);
+		}
+
 		out_stream << std::endl;
 		
 	}
@@ -229,7 +241,6 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		std::getline(in_stream, dummy);
 		inherit_nodes_size = read_number_in_line_int(dummy);
 		for (int i = 0; i < inherit_nodes_size; ++i) {
-			std::cout << "herererejj" << std::endl;
 			std::getline(in_stream, dummy);
 			std::istringstream stream(dummy);
 			std::string key, value;
@@ -305,9 +316,31 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 			indicesOfOutputs.push_back(read_number_in_line_int(dummy));
 		}
 
+		int listOfInputs_size;
+		std::getline(in_stream, dummy);
+		listOfInputs_size = read_number_in_line_int(dummy);
+		listOfInputs.clear();
+		for (int i = 0; i < listOfInputs_size; ++i) {
+			std::getline(in_stream, dummy);
+			std::string key = dummy;
+			MaBoSSInput input;
+			input.read_maboss_input(in_stream);
+			listOfInputs[key] = input;
+		}
+
+		int listOfOutputs_size;
+		std::getline(in_stream, dummy);
+		listOfOutputs_size = read_number_in_line_int(dummy);
+		listOfOutputs.clear();
+		for (int i = 0; i < listOfOutputs_size; ++i) {
+			std::getline(in_stream, dummy);
+			std::string key = dummy;
+			MaBoSSOutput output;
+			output.read_maboss_output(in_stream);
+			listOfOutputs[key] = output;
+		}
 		// skip empty line
 		std::getline(in_stream, dummy);
-	
 	}
 
 	void display(std::ostream& os);

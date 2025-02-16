@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from scipy.io import loadmat
 import xml.etree.ElementTree as ET
 from utils.multicellDS_second import MultiCellDS_second
+#from multicellDS_second import MultiCellDS_second
 
 def conversion(output_folder, save_folder):
     # Creazione del lettore MCDS
@@ -34,4 +35,8 @@ def conversion(output_folder, save_folder):
 
     return
 
+if __name__ == '__main__':
+    output_folder = '../model/output'
+    save_folder = '../model/start_and_stop_saving_files'
+    conversion(output_folder, save_folder)
 

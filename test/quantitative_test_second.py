@@ -69,10 +69,12 @@ def create_combined_boxplots(output_dir):
         data_to_plot_normal = [data_normal[j] for j in range(len(x_values))]
         data_to_plot_s_s = [data_s_s[j] for j in range(len(x_values))]
 
+        print(len(data_normal))
+
         # Store the boxplot elements to use in the legend
         boxplot_elements = []
 
-        for j in range(10):
+        for j in range(len(x_values)):
             # Plot the boxplots using the integer positions on the x-axis
             # Adjust the positions to place the boxplots side by side
             bp_normal = ax.boxplot(data_to_plot_normal[j], positions=[x_positions[j] - 0.2], widths=0.3, patch_artist=True, boxprops=dict(facecolor=colors[i]))
@@ -112,9 +114,9 @@ def create_combined_boxplots(output_dir):
 def quantitative_test(output_dir):
     dir = os.getcwd()
 
-    num_simu = 1
+    num_simu = 30
 
-    step = 300
+    step = 600
 
     two_D = True
 

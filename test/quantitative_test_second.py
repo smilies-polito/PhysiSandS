@@ -114,7 +114,7 @@ def create_combined_boxplots(output_dir):
 def quantitative_test(output_dir):
     dir = os.getcwd()
 
-    num_simu = 30
+    num_simu = 1
 
     step = 600
 

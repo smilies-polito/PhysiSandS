@@ -144,7 +144,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 
 	#pragma omp parallel for 
 	for( int i=0; i < (*all_cells).size(); i++ )
-	{
+	{	
 		if( (*all_cells)[i]->is_out_of_domain == false && initialzed ) {
 
 			if( (*all_cells)[i]->phenotype.intracellular != NULL  && (*all_cells)[i]->phenotype.intracellular->need_update())
@@ -157,7 +157,10 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 				if ((*all_cells)[i]->functions.post_update_intracellular != NULL)
 					(*all_cells)[i]->functions.post_update_intracellular( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
 			}
+			
 		}
+
+		
 	}
 	
 	if( fabs(time_since_last_cycle-phenotype_dt_ ) < phenotype_dt_tolerance || !initialzed)
@@ -175,11 +178,12 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		// checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
-		{
+		{	
 			if( (*all_cells)[i]->is_out_of_domain == false )
 			{
 				(*all_cells)[i]->advance_bundled_phenotype_functions( time_since_last_cycle ); 
 			}
+			
 		}
 		
 		// process divides / removes 
@@ -429,12 +433,6 @@ Cell_Container* create_cell_container_for_microenvironment( BioFVM::Microenviron
 void Cell_Container::save_data(std::ofstream& os){
 	os << "Cell_container:" << std::endl;
 
-	//Cells_ready_to_divide
-	os << "Cells_ready_to_divide: " << cells_ready_to_divide.size() << std::endl;
-
-	//cells_ready_to_die
-	os << "cells_ready_to_die: " << cells_ready_to_die.size() << std::endl;
-
 	//boundary_condition_for_pushed_out_agents
 	os << "boundary_condition_for_pushed_out_agents: " << boundary_condition_for_pushed_out_agents << std::endl;
 
@@ -486,8 +484,6 @@ void Cell_Container::reset_data(std::ifstream& is){
 	std::string dummy;
 
 	//skip first 3 lines
-	std::getline(is, dummy);
-	std::getline(is, dummy);
 	std::getline(is, dummy);
 
 	//cell_cell_adhesion_strength

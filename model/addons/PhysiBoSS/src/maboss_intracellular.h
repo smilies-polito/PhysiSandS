@@ -135,6 +135,10 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		this->maboss.init_maboss(networkFile, configFile);
 	}
 
+	void set_state_int(){
+		this->maboss.set_state(this->maboss.get_maboss_state());
+	}
+
 	void save_current_parameters(std::ostream& out_stream){
 
 		out_stream << "maboss_intracellular_parameters:" << std::endl;

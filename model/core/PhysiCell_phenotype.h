@@ -688,6 +688,7 @@ class Intracellular
 	virtual void save_current_parameters_maboss(std::ostream& out_stream) = 0;
 	virtual void read_current_parameter_maboss(std::ifstream& in_stream) = 0;
 	virtual void reinit_maboss(std::string networkFile, std::string configFile) = 0;
+	virtual void set_state_int() = 0;
 	
 
     // ================  specific to "roadrunner" ================

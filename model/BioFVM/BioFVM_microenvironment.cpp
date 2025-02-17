@@ -2003,12 +2003,15 @@ std::istream& operator>>(std::istream& is, Microenvironment& microenv){
 
 	//gradient_vector_computed
 	std::getline(is, dummy);
+	//std::cout << dummy << std::endl;
 	bool gradient_vector_computed;
 	std::istringstream stream_gradient_vector_computed(dummy);
 	std::string key_gradient_vector_computed;
 	stream_gradient_vector_computed >> key_gradient_vector_computed;
 	for (int i = 0; i < microenv.gradient_vector_computed.size(); i++){
-		stream_gradient_vector_computed >> value;
+		stream_gradient_vector_computed >> value_2;
+		//std::cout << stream_gradient_vector_computed.str() << std::endl;
+		//std::cout << value << std::endl;
 		if(value_2 == "true"){
 			gradient_vector_computed = true;
 		}

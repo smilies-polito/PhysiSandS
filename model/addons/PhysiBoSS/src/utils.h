@@ -73,7 +73,10 @@ public:
         inact_threshold = read_number_in_line(dummy);
 
         std::getline(in_stream, dummy);
+        //std::cout << "dummy: " << dummy << std::endl;   
+        //std::cout << "scaling pre: " << scaling << std::endl;
         scaling = read_number_in_line(dummy);
+        //std::cout << "scaling post: " << scaling << std::endl;
 
         std::getline(in_stream, dummy);
         smoothing = read_number_in_line_int(dummy);

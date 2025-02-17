@@ -19,6 +19,8 @@ void reset_microenv(){
     // Call the operator>> function to read data from the file into the Microenvironment instance
     input_file >> microenvironment;
 
+	setup_signal_behavior_dictionaries();
+
     // Close the file
     input_file.close();
 	return;
@@ -374,9 +376,13 @@ void reset_cell(double last_cell_cycle_time)
 			// Check if the number of nodes is the same
 
 			assert(n_line == pCell->phenotype.intracellular->get_number_of_nodes());
+			//pCell->phenotype.intracellular->set_state_int();
+			//pCell->phenotype.intracellular->update(pCell, pCell->phenotype, phenotype_dt);
+			
 		}
 		
 	}
+		
 		input_file_cells.close();
 		input_file_bool.close();
 		return;
@@ -455,6 +461,7 @@ void reset_cell(double last_cell_cycle_time)
 
 	//reset cell_container
 	cell_container->reset_data(global_param_file);
+
 
 	// Close the file after finishing reading
     global_param_file.close();

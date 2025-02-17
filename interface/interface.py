@@ -256,6 +256,7 @@ class interface:
             step_epithelial.append(epithelial)
             step_mesenchymal.append(mesenchymal)
             time_steps.append(t)
+            print(f"Total epithelial {epithelial} and mesenchymal {mesenchymal} cells at time {t}")
 
         return time_steps, step_epithelial, step_mesenchymal
 

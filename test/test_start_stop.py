@@ -57,8 +57,6 @@ def test_start_and_stop(num_simu, step, two_D):
         for stop in stops:
 
             index = time_steps_flag.index(stop)
-            print(index)
-            print(len(step_alive_flag))
 
             data_to_plot_alive[n].extend([step_alive_flag[index]])
 

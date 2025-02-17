@@ -2428,42 +2428,71 @@ std::ostream& operator<<(std::ostream& os, const Phenotype& phenotype) {
     }
 
 };
-double read_number_in_line(const std::string& line){
+double read_number_in_line(const std::string& line) {
     std::istringstream stream(line);
     std::string key;
     stream >> key;
     std::string numberStr;
-    if(stream >> numberStr) {
+
+    if (stream >> numberStr) {
         try {
             long double value = std::stod(numberStr);
-			
-            return value;
-        } catch (std::invalid_argument& e) {
-            throw std::runtime_error("Failed to parse value from line");
-        } catch (std::out_of_range& e) {
-            throw std::runtime_error("Value out of range for type");
+
+            if (value > std::numeric_limits<double>::max()) {
+                std::cerr << "Warning: Value out of range (too large), setting to max double: " 
+                          << numberStr << std::endl;
+                return std::numeric_limits<double>::max();
+            }
+            if (value < -std::numeric_limits<double>::max()) {
+                std::cerr << "Warning: Value out of range (too small), setting to min double: " 
+                          << numberStr << std::endl;
+                return -std::numeric_limits<double>::max();
+            }
+
+            return static_cast<double>(value);
+        } catch (std::invalid_argument&) {
+            throw std::runtime_error("Failed to parse value from line: " + line);
+        } catch (std::out_of_range&) {
+            std::cerr << "Warning: Value out of range, setting to max double: " << numberStr << std::endl;
+            return std::numeric_limits<double>::max();
         }
     }
-    throw std::runtime_error("Failed to parse value from line");
-};
 
-int read_number_in_line_int(const std::string& line){
+    throw std::runtime_error("Failed to parse value from line: " + line);
+}
+
+int read_number_in_line_int(const std::string& line) {
     std::istringstream stream(line);
     std::string key;
     stream >> key;
     std::string numberStr;
-    if(stream >> numberStr) {
+
+    if (stream >> numberStr) {
         try {
-            int value = std::stoi(numberStr);
-            return value;
-        } catch (std::invalid_argument& e) {
-            throw std::runtime_error("Failed to parse value from line");
-        } catch (std::out_of_range& e) {
-            throw std::runtime_error("Value out of range for type");
+            long long value = std::stoll(numberStr); // Usa `stoll` per evitare overflow con `stoi`
+
+            if (value > std::numeric_limits<int>::max()) {
+                std::cerr << "Warning: Value out of range (too large), setting to max int: " 
+                          << numberStr << std::endl;
+                return std::numeric_limits<int>::max();
+            }
+            if (value < std::numeric_limits<int>::min()) {
+                std::cerr << "Warning: Value out of range (too small), setting to min int: " 
+                          << numberStr << std::endl;
+                return std::numeric_limits<int>::min();
+            }
+
+            return static_cast<int>(value);
+        } catch (std::invalid_argument&) {
+            throw std::runtime_error("Failed to parse value from line: " + line);
+        } catch (std::out_of_range&) {
+            std::cerr << "Warning: Value out of range, setting to max int: " << numberStr << std::endl;
+            return std::numeric_limits<int>::max();
         }
     }
-    throw std::runtime_error("Failed to parse value from line");
-};
+
+    throw std::runtime_error("Failed to parse value from line: " + line);
+}
 
 bool read_number_in_line_bool(const std::string& line){
 	std::istringstream stream(line);

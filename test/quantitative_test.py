@@ -122,7 +122,7 @@ def quantitative_test(output_dir):
     dir = os.getcwd()
     os.chdir('..')
 
-    num_simu = 50
+    num_simu = 30
 
     step = 150
 

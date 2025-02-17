@@ -118,7 +118,7 @@ def start_stop_simu_second(step, two_D):
     return time_steps_flag, step_epithelial_flag, step_mesenchymal_flag
 
 if __name__ == "__main__":
-    step = 300
+    step = 600
     two_D = True
     time_steps, step_epithelial, step_mesenchymal  = start_stop_simu_second(step, two_D)
     #start_stop_simu(step, two_D)

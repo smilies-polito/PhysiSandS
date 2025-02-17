@@ -332,7 +332,7 @@ void reset_cell(double last_cell_cycle_time)
 				}
 			}
 			// reinit maboss
-			pCell->phenotype.intracellular->reinit_maboss(current_bnd_filename, current_cfg_filename);
+			//pCell->phenotype.intracellular->reinit_maboss(current_bnd_filename, current_cfg_filename);
 		}
 
 		// current_voxel_index

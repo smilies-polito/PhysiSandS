@@ -52,15 +52,15 @@
         "path": "user_parameters/seed_tnf"
     },
     "start_stop": {
-        "value": "false",
+        "value": "true",
         "path": "user_parameters/start_stop"
     },
     "auto_stop": {
-        "value": "false",
+        "value": "true",
         "path": "user_parameters/auto_stop"
     },
     "auto_stop_resistance": {
-        "value": "false",
+        "value": "true",
         "path": "user_parameters/auto_stop_resistance"
     }
 }

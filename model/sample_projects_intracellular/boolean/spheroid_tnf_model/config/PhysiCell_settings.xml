@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">600</max_time>
+		<max_time units="min">1440</max_time>
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 		<dt_diffusion units="min">0.02</dt_diffusion>
@@ -192,13 +192,13 @@
 		<membrane_length type="double" units="">120</membrane_length>
 		
 		<start_stop type="bool" units="">false</start_stop>
-		<auto_stop type="bool" units="">false</auto_stop>
-		<auto_stop_resistance type="bool" units="">false</auto_stop_resistance>
+		<auto_stop type="bool" units="">true</auto_stop>
+		<auto_stop_resistance type="bool" units="">true</auto_stop_resistance>
 
 		<if_start_inj type="bool" units="none">true</if_start_inj>
-		<tnf_pulse_period type="double" units="min">150</tnf_pulse_period> 
-		<tnf_pulse_duration type="double" units="min">10</tnf_pulse_duration> 
-		<tnf_pulse_concentration type="double" units="TNF/um^3">0.005</tnf_pulse_concentration> 
+		<tnf_pulse_period type="double" units="min">100000000000</tnf_pulse_period> 
+		<tnf_pulse_duration type="double" units="min">10000000000</tnf_pulse_duration> 
+		<tnf_pulse_concentration type="double" units="TNF/um^3">0.1</tnf_pulse_concentration> 
 		<time_remove_tnf type="double" units="min">999999</time_remove_tnf> 
 		
 		

@@ -1,3 +1,3 @@
-counter_double_random: 18729858
-counter_int_random: 563
-counter_normal_random: 32622
+counter_double_random: 13675142
+counter_int_random: 753
+counter_normal_random: 41105

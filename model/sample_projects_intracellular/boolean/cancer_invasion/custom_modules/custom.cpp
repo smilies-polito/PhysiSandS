@@ -399,3 +399,18 @@ std::string my_coloring_function_for_stroma( double concentration, double max_co
 	 return paint_by_density_percentage( concentration,  max_conc,  min_conc); 
 
 }
+
+void EMT_inibitor_function(){
+	for (int i = 0; i < (*all_cells).size(); i++)
+	{
+		std::string node_name = "EMT_inhibitor";
+		bool node_value = true;
+		// Access the current cell
+		Cell *pCell = (*all_cells)[i];
+		pCell->phenotype.intracellular->set_boolean_variable_value(node_name, node_value);
+	}
+
+	return;
+
+}
+

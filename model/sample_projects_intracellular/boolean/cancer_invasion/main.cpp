@@ -124,6 +124,7 @@ int main( int argc, char* argv[] )
 	setup_microenvironment(); // modify this in the custom code 
 
 	bool start_stop = parameters.bools("start_stop");
+	bool EMT_inibitor = parameters.bools("EMT_inibitor");
 	
 	/* PhysiCell setup */ 
  	
@@ -153,6 +154,10 @@ int main( int argc, char* argv[] )
 
 	} else{
 		setup_tissue(); //death model index = 1 == necrotic...= 0 == apoptotic.
+	}
+
+	if( EMT_inibitor){
+		EMT_inibitor_function();
 	}
 	/* Users typically stop modifying here. END USERMODS */ 
 	

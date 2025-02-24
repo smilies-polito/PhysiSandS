@@ -6,8 +6,8 @@ import re
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
 import xml.etree.ElementTree as ET
-#from utils.multicellDS_second import MultiCellDS_second
-from multicellDS_second import MultiCellDS_second
+from utils.multicellDS_second import MultiCellDS_second
+#from multicellDS_second import MultiCellDS_second
 
 def conversion(output_folder, save_folder):
     # Creazione del lettore MCDS

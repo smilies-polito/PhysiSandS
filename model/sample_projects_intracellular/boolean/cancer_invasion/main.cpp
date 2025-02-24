@@ -124,7 +124,7 @@ int main( int argc, char* argv[] )
 	setup_microenvironment(); // modify this in the custom code 
 
 	bool start_stop = parameters.bools("start_stop");
-	bool EMT_inibitor = parameters.bools("EMT_inibitor");
+	bool EMT_inhibitor = parameters.bools("EMT_inhibitor");
 	
 	/* PhysiCell setup */ 
  	
@@ -156,8 +156,8 @@ int main( int argc, char* argv[] )
 		setup_tissue(); //death model index = 1 == necrotic...= 0 == apoptotic.
 	}
 
-	if( EMT_inibitor){
-		EMT_inibitor_function();
+	if( EMT_inhibitor){
+		EMT_inhibitor_function();
 	}
 	/* Users typically stop modifying here. END USERMODS */ 
 	
@@ -212,12 +212,15 @@ int main( int argc, char* argv[] )
 	if( start_stop ){
 		reset_randomness();
 	}
+
+	//define auto stop variable
+	bool stop = false;
 	
 	// main loop 
 	
 	try 
 	{		
-		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt )
+		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt && stop!=true)
 		{
 			// save data if it's time. 
 			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt )
@@ -236,10 +239,14 @@ int main( int argc, char* argv[] )
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
 					save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
+					if ( parameters.bools("auto_stop") ){
+						stop = auto_stop();
+				}
 				}
 				
 				PhysiCell_globals.full_output_index++; 
 				PhysiCell_globals.next_full_save_time += PhysiCell_settings.full_save_interval;
+
 			}
 			
 			// save SVG plot if it's time

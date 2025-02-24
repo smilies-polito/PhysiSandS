@@ -490,7 +490,7 @@ int save_resistant_cells(ofstream& file_resistant){
         {"FASL", "TNF", "TNFR", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
         {"TNF", "TNFR", "DISC-TNF", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
         {"FASL", "DISC-FAS", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
-        {"FASL", "TNF", "TNFR", "DISC-TNF", "DISC-TNF", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"}
+        {"FASL", "TNF", "TNFR", "DISC-TNF", "DISC-FAS", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"}
     };
 
     // Read the bool_data.txt file
@@ -540,7 +540,7 @@ bool auto_stop() {
 
 	bool condition = false;
 	bool stop;
-	// impèlement here your condition to stop the simulation
+	// implement here your condition to stop the simulation
 
     if (condition) {
         stop = true;

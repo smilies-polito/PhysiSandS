@@ -324,7 +324,7 @@ class interface:
         ax.set_ylabel('Number of Cells', fontsize=14)
         ax.set_title('Epithelial vs. Mesenchymal Cell Population Over Time', fontsize=16)
         ax.tick_params(axis='both', which='major', labelsize=15)
-        ax.legend(fontsize=15)
+        ax.legend(loc='upper left', fontsize=15)
         ax.grid(True)
 
         # Save the plot
@@ -338,7 +338,7 @@ class interface:
                         'FASL TNF TNFR RIP1 RIP1ub RIP1K IKK NFkB BCL2 ATP cIAP XIAP cFLIP Survival',
                         'TNF TNFR DISC-TNF FADD RIP1 RIP1ub RIP1K IKK NFkB BCL2 ATP cIAP XIAP cFLIP Survival',
                         'FASL DISC-FAS FADD RIP1 RIP1ub RIP1K IKK NFkB BCL2 ATP cIAP XIAP cFLIP Survival',
-                        'FASL TNF TNFR DISC-TNF DISC-TNF FADD RIP1 RIP1ub RIP1K IKK NFkB BCL2 ATP cIAP XIAP cFLIP Survival']
+                        'FASL TNF TNFR DISC-TNF DISC-FAS FADD RIP1 RIP1ub RIP1K IKK NFkB BCL2 ATP cIAP XIAP cFLIP Survival']
         for i in range(len(stable_states)):
             stable_states[i] = stable_states[i].split(' ')
 

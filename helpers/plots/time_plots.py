@@ -26,25 +26,29 @@ def time_plot(quantitative_test, quantitative_test_second, output_folder):
     
     # Creare i dati per il boxplot
     data = [durations1, durations_start_stop1, durations2, durations_start_stop2]
-    labels = ['TNF tumor', 'TNF tumor', 'Cancer invasion', 'Cancer invasion']
+    labels = ['TNF tumor', 'TNF tumor Start&Stop', 'Cancer invasion', 'Cancer invasion Start&Stop']
     colors = ['blue', 'blue', 'red', 'red']
     
-    # Creare la figura
-    fig, ax = plt.subplots()
+    # Creare la figura con dimensioni maggiori
+    fig, ax = plt.subplots(figsize=(10, 6))
     
     # Plottare il boxplot
     box = ax.boxplot(data, patch_artist=True, labels=labels)
+    #ax.set_xticklabels(labels, rotation=45, ha='right')
     
     # Colorare i box
     for patch, color in zip(box['boxes'], colors):
         patch.set_facecolor(color)
     
     # Etichette e titolo
-    ax.set_ylabel('Durations')
+    ax.set_ylabel('CPU time (sec)')
     ax.set_xlabel('Test Type')
-    ax.set_title('Comparison of Normal and Start and Stop Durations')
+    ax.set_title('Comparison of Normal and Start and Stop CPU time')
+    
+    # Regolare i margini per evitare che le etichette vengano tagliate
+    plt.tight_layout()
         
-    # Mostrare il grafico
+    # Salvare il grafico
     plt.savefig(os.path.join(output_folder, 'time_plot.png'))
 
 

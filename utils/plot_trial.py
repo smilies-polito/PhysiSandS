@@ -68,7 +68,7 @@ def plot_second(output_folder, time_steps, epithelial_step, mesenchymal_step, st
         ax.set_ylabel('Number of Cells', fontsize=14)
         ax.set_title('Epithelial vs. Mesenchymal Cell Population Over Time', fontsize=16)
         ax.tick_params(axis='both', which='major', labelsize=15)
-        ax.legend(fontsize=15)
+        ax.legend(loc='upper left', fontsize=15)
         ax.grid(True)
 
         # Save the plot

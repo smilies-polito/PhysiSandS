@@ -671,7 +671,7 @@
 
     <user_parameters>
     	<start_stop type="bool" units="">false</start_stop>
-        <auto_stop type="bool" units="">true</auto_stop>
+        <auto_stop type="bool" units="">false</auto_stop>
         <EMT_knockout type="bool" units="" description="set to true to inhibit EMT">false</EMT_knockout>
 
         <random_seed type="int" units="dimensionless" description="">0</random_seed>

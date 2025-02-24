@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -64,484 +64,365 @@
 #                                                                             #
 ###############################################################################
 */
-
-#include "./custom.h"
-#include <algorithm>
-#include <iostream>
-#include <fstream>
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <sstream>
-#include <vector>
-#include <string>
-#include <unordered_set>
-#include <cstdlib>
+#include "./custom.h"
+#include "../BioFVM/BioFVM.h"  
 
-
-// declare cell definitions here
-void create_cell_types(void)
+void create_cell_types( void )
 {
-	SeedRandom();
-
-	initialize_default_cell_definition();
-
-	/*  This parses the cell definitions in the XML config file.  */
-	initialize_cell_definitions_from_pugixml();
-
-	//  This sets the pre and post intracellular update functions
-	cell_defaults.functions.pre_update_intracellular =  update_boolean_model_inputs;
-	cell_defaults.functions.post_update_intracellular = update_behaviors;
-	cell_defaults.functions.update_phenotype = NULL; 
-	
-	//  This initializes the the TNF receptor model
-	tnf_receptor_model_setup();
-	tnf_boolean_model_interface_setup();
-	submodel_registry.display(std::cout);
-
-	// Needs to initialize one of the receptor state to the total receptor value
-	cell_defaults.custom_data["unbound_external_TNFR"] = cell_defaults.custom_data["TNFR_receptors_per_cell"];
-	cell_defaults.custom_data["bound_external_TNFR"] = 0;
-	cell_defaults.custom_data["bound_internal_TNFR"] = 0;
-
-	build_cell_definitions_maps();
-	
-	setup_signal_behavior_dictionaries();
-
-	display_cell_definitions(std::cout);
-
-	return;
-}
-
-
-void setup_microenvironment(void)
-{
-	initialize_microenvironment();
-	return;
-}
-
-void setup_tissue(void)
-{
-	std::vector<std::vector<double>> positions;
-	
-	if ( parameters.bools("read_init") )
+	// set the random seed 
+	if (parameters.ints.find_index("random_seed") != -1)
 	{
-		std::string csv_fname = parameters.strings("init_cells_filename");
-		positions = read_cells_positions(csv_fname, '\t', true);
-
-	}
-	else
-	{
-		double cell_radius = cell_defaults.phenotype.geometry.radius; 
-		double tumor_radius =  parameters.doubles("tumor_radius");
-		if (default_microenvironment_options.simulate_2D == true)
-			positions = create_cell_disc_positions(cell_radius,tumor_radius); 
-		else
-			positions = create_cell_sphere_positions(cell_radius,tumor_radius);
-
+		SeedRandom(parameters.ints("random_seed"));
 	}
 
-	Cell* pCell = NULL; 
-	for (int i = 0; i < positions.size(); i++)
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
+	
+	initialize_default_cell_definition(); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
+
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
+	cell_defaults.functions.contact_function = NULL; 
+	
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
+	
+	initialize_cell_definitions_from_pugixml(); 
+
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
+	build_cell_definitions_maps(); 
+
+	/*
+	   This intializes cell signal and response dictionaries 
+	*/
+
+	setup_signal_behavior_dictionaries(); 	
+	
+	/*
+       Cell rule definitions 
+	*/
+
+	setup_cell_rules(); 
+
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
+
+	cell_defaults.functions.pre_update_intracellular = pre_update_intracellular;
+	cell_defaults.functions.post_update_intracellular = post_update_intracellular;
+	
+	cell_defaults.functions.update_phenotype = phenotype_function; 
+	cell_defaults.functions.custom_cell_rule = custom_function; 
+	cell_defaults.functions.contact_function = contact_function; 
+
+	Cell_Definition* pCD = find_cell_definition( "epithelial");
+
+	pCD->functions.pre_update_intracellular = pre_update_intracellular;
+	pCD->functions.post_update_intracellular = post_update_intracellular;
+	pCD->functions.custom_cell_rule = custom_function; 
+	pCD->functions.contact_function = contact_function; 
+	pCD->functions.update_velocity = standard_update_cell_velocity; 
+
+	pCD = find_cell_definition( "mesenchymal");
+	pCD->functions.pre_update_intracellular = pre_update_intracellular;
+	pCD->functions.post_update_intracellular = post_update_intracellular;
+	pCD->functions.custom_cell_rule = custom_function; 
+	pCD->functions.contact_function = contact_function;
+	pCD->functions.update_velocity = standard_update_cell_velocity; 
+	
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
+	display_cell_definitions( std::cout ); 
+	
+	return; 
+}
+
+void set_substrate_density(int density_index, double max, double min, double radius)
+{
+	std::cout << "SETTING SUBSTRATE --> " << density_index << std::endl;
+	// Inject given concentration on the extremities only
+
+	std::cout << microenvironment.number_of_voxels() << "\n";
+
+	for (unsigned int n = 0; n < microenvironment.number_of_voxels(); n++)
 	{
-		pCell = create_cell(get_cell_definition("default"));
-		pCell->assign_position(positions[i]);
+		auto current_voxel = microenvironment.voxels(n);
+		double t_norm = norm(current_voxel.center);
 
-		static int idx_bind_rate = pCell->custom_data.find_variable_index( "TNFR_binding_rate" );
-		static float mean_bind_rate = pCell->custom_data[idx_bind_rate];
-		static float std_bind_rate = parameters.doubles("TNFR_binding_rate_std");
-		static float min_bind_rate = parameters.doubles("TNFR_binding_rate_min");
-		static float max_bind_rate = parameters.doubles("TNFR_binding_rate_max");
-		
-		if(std_bind_rate > 0 )
-		{
-			pCell->custom_data[idx_bind_rate] = NormalRandom(mean_bind_rate, std_bind_rate);
-			if (pCell->custom_data[idx_bind_rate] < min_bind_rate)
-			{ pCell->custom_data[idx_bind_rate] = min_bind_rate; }
-			if (pCell->custom_data[idx_bind_rate] > max_bind_rate)
-			{ pCell->custom_data[idx_bind_rate] = max_bind_rate; }
-		}
+		if ((radius - t_norm) <= 0)
+			microenvironment.density_vector(n)[density_index] = current_value(min, max, uniform_random());
+	}
+}
 
+void setup_microenvironment( void )
+{
+	// set domain parameters 
+	
+	// put any custom code to set non-homogeneous initial conditions or 
+	// extra Dirichlet nodes here. 
+	
+	// initialize BioFVM 
+	
+	initialize_microenvironment(); 
 
-		static int idx_endo_rate = pCell->custom_data.find_variable_index( "TNFR_endocytosis_rate" );
-		static float mean_endo_rate = pCell->custom_data[idx_endo_rate];
-		static float std_endo_rate = parameters.doubles("TNFR_endocytosis_rate_std");
-		static float min_endo_rate = parameters.doubles("TNFR_endocytosis_rate_min");
-		static float max_endo_rate = parameters.doubles("TNFR_endocytosis_rate_max");
-		
-		if(std_endo_rate > 0)
-		{
-			pCell->custom_data[idx_endo_rate] = NormalRandom(mean_endo_rate, std_endo_rate);
-			if (pCell->custom_data[idx_endo_rate] < min_endo_rate)
-			{ pCell->custom_data[idx_endo_rate] = min_endo_rate; }
-			if (pCell->custom_data[idx_endo_rate] > max_endo_rate)
-			{ pCell->custom_data[idx_endo_rate] = max_endo_rate; }
-		}
-		
-		static int idx_recycle_rate = pCell->custom_data.find_variable_index( "TNFR_recycling_rate" ); 
-		static float mean_recycle_rate = pCell->custom_data[idx_recycle_rate];
-		static float std_recycle_rate = parameters.doubles("TNFR_recycling_rate_std");
-		static float min_recycle_rate = parameters.doubles("TNFR_recycling_rate_min");
-		static float max_recycle_rate = parameters.doubles("TNFR_recycling_rate_max");
+	double ECM_min = parameters.doubles("density_ECM_min");
+	double ECM_max = parameters.doubles("density_ECM_max");
+	double tgfbeta_max = parameters.doubles("density_tgfbeta_max");
+	double tgfbeta_min = parameters.doubles("density_tgfbeta_min");
 
-		if(std_recycle_rate > 0)
-		{
-			pCell->custom_data[idx_recycle_rate] = NormalRandom(mean_recycle_rate, std_recycle_rate);
-			if (pCell->custom_data[idx_recycle_rate] < min_recycle_rate)
-			{ pCell->custom_data[idx_recycle_rate] = min_recycle_rate; }
-			if (pCell->custom_data[idx_recycle_rate] > max_recycle_rate)
-			{ pCell->custom_data[idx_recycle_rate] = max_recycle_rate; }
-		}
-		
-		update_monitor_variables(pCell);
+	if(ECM_max != ECM_min){
+	int ecm_index = microenvironment.find_density_index("ecm");
+	set_substrate_density(ecm_index, ECM_max, ECM_min);
+	}
+	if(tgfbeta_max != tgfbeta_min){
+	int tgfbeta_index = microenvironment.find_density_index("TGFbeta");
+	set_substrate_density(tgfbeta_index, tgfbeta_max, tgfbeta_min);
 	}
 
-	return;
+	return; 
 }
 
-void update_variables_monitor()
+void setup_tissue( void )
 {
-	for (int i = 0; i < (*all_cells).size(); i++)
-	{
-		// Access the current cell
-		Cell *pCell = (*all_cells)[i];
+	// place a cluster of tumor cells at the center 
+	load_cells_from_pugixml(); 
 
-		update_monitor_variables(pCell);
-	}
-
-
-}
-
-std::vector<std::vector<double>> read_cells_positions(std::string filename, char delimiter, bool header)
-{
-	// File pointer
-	std::fstream fin;
-	std::vector<std::vector<double>> positions;
-
-	// Open an existing file
-	fin.open(filename, std::ios::in);
-
-	// Read the Data from the file
-	// as String Vector
-	std::vector<std::string> row;
-	std::string line, word;
-
-	if (header)
-	{ getline(fin, line); }
-
-	do
-	{
-		row.clear();
-
-		// read an entire row and
-		// store it in a string variable 'line'
-		getline(fin, line);
-
-		// used for breaking words
-		std::stringstream s(line);
-
-		while (getline(s, word, delimiter))
-		{ 
-			row.push_back(word); 
-		}
-
-		std::vector<double> tempPoint(3,0.0);
-		tempPoint[0]= std::stof(row[0]);
-		tempPoint[1]= std::stof(row[1]);
-		tempPoint[2]= std::stof(row[2]);
-
-		positions.push_back(tempPoint);
-	} while (!fin.eof());
-
-	return positions;
-}
-
-std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius, double sphere_radius)
-{
-	std::vector<std::vector<double>> cells;
-	int xc=0,yc=0,zc=0;
-	double x_spacing= cell_radius*sqrt(3);
-	double y_spacing= cell_radius*2;
-	double z_spacing= cell_radius*sqrt(3);
-	
-	std::vector<double> tempPoint(3,0.0);
-	// std::vector<double> cylinder_center(3,0.0);
-	
-	for(double z=-sphere_radius;z<sphere_radius;z+=z_spacing, zc++)
-	{
-		for(double x=-sphere_radius;x<sphere_radius;x+=x_spacing, xc++)
+	// removing substrate in cell voxel
+	int ecm_index = BioFVM::microenvironment.find_density_index("ecm");
+	int tgfbeta_index = BioFVM::microenvironment.find_density_index("tgfbeta");
+	for( int i=0; i < (*all_cells).size(); i++ )
 		{
-			for(double y=-sphere_radius;y<sphere_radius;y+=y_spacing, yc++)
-			{
-				tempPoint[0]=x + (zc%2) * 0.5 * cell_radius;
-				tempPoint[1]=y + (xc%2) * cell_radius;
-				tempPoint[2]=z;
-				
-				if(sqrt(norm_squared(tempPoint))< sphere_radius)
-				{ cells.push_back(tempPoint); }
-			}
+			Cell* pC = (*all_cells)[i]; 
+
+			int voxel_index = pC->get_current_voxel_index();
+			microenvironment.density_vector(voxel_index)[ecm_index] = 0.0;
+			microenvironment.density_vector(voxel_index)[tgfbeta_index] = 0.0;
+		}
+}
+
+
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
+{ return; }
+
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
+{ 	
+
+	pCell->custom_data["cell_contact"] = 0.0;
+	for( int j=0; j < pCell->nearby_interacting_cells().size(); j++ )
+    {
+        Cell* pTest = pCell->nearby_interacting_cells()[j]; 
+		contact_function(pCell, phenotype, pTest, pTest->phenotype, dt);
+    }
+	
+	for( int j=0; j < pCell->state.spring_attachments.size(); j++ )
+    {
+        Cell* pTest = pCell->state.spring_attachments[j]; 
+        contact_function(pCell, phenotype, pTest, pTest->phenotype, dt);
+    }
+
+	// ADDING ECM PHYSICAL INTERACTION AND ADHESION
+
+	pCell->custom_data["ecm_contact"] = 0.0;
+	pCell->custom_data["nucleus_deform"] = 0.0;
+	//std::cout << pCell->custom_data["nucleus_deform"] << std::endl;
+
+	int ecm_index = BioFVM::microenvironment.find_density_index("ecm");
+	if ( ecm_index >= 0 ){
+		add_ecm_interaction( pCell, ecm_index, pCell->get_current_voxel_index() );
+		//add_TGFbeta_interaction(pCell, pCell->get_current_mechanics_voxel_index());
+		std::vector<int>::iterator neighbor_voxel_index;
+		std::vector<int>::iterator neighbor_voxel_index_end = 
+		microenvironment.mesh.moore_connected_voxel_indices[pCell->get_current_voxel_index()].end();
+
+		for( neighbor_voxel_index = 
+			microenvironment.mesh.moore_connected_voxel_indices[pCell->get_current_voxel_index()].begin();
+			neighbor_voxel_index != neighbor_voxel_index_end; 
+			++neighbor_voxel_index )
+		{
+			add_ecm_interaction( pCell, ecm_index, *neighbor_voxel_index );
 			
 		}
+
+		/* pCell->update_motility_vector(dt); 
+		pCell->velocity += phenotype.motility.motility_vector; */
 	}
-	return cells;
 	
+	return; 	
+} 
+
+// This function is never called because I am not using "dynamic attachment" but I am using the "dynamic SPRING adhesion"
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
+{ 
+
+	std::vector<double> displacement = pOther->position;
+	displacement -= pMe->position;
+	double distance = norm( displacement ); 
+			
+	double max_distance = pMe->phenotype.geometry.radius + 
+				pOther->phenotype.geometry.radius; 
+	max_distance *=  pMe->phenotype.mechanics.relative_maximum_adhesion_distance;  //parameters.doubles("max_interaction_factor"); 
+
+			//std::cout << max_distance << " - " << distance << "\n";
+
+	double interaction_distance = max_distance - distance;
+
+	if (interaction_distance > 0){
+
+		double perc_distance = distance / pMe->phenotype.geometry.radius ;
+		pMe->custom_data["cell_contact"] += perc_distance;
+			}
+	else {
+		detach_cells_as_spring(pMe, pOther);
+	}
+
+	return; 
+} 
+
+void pre_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt){
+	return;
 }
 
-std::vector<std::vector<double>> create_cell_disc_positions(double cell_radius, double disc_radius)
-{	 
-	double cell_spacing = 0.95 * 2.0 * cell_radius; 
-	
-	double x = 0.0; 
-	double y = 0.0; 
-	double x_outer = 0.0;
-
-	std::vector<std::vector<double>> positions;
-	std::vector<double> tempPoint(3,0.0);
-	
-	int n = 0; 
-	while( y < disc_radius )
-	{
-		x = 0.0; 
-		if( n % 2 == 1 )
-		{ x = 0.5 * cell_spacing; }
-		x_outer = sqrt( disc_radius*disc_radius - y*y ); 
-		
-		while( x < x_outer )
-		{
-			tempPoint[0]= x; tempPoint[1]= y;	tempPoint[2]= 0.0;
-			positions.push_back(tempPoint);			
-			if( fabs( y ) > 0.01 )
-			{
-				tempPoint[0]= x; tempPoint[1]= -y;	tempPoint[2]= 0.0;
-				positions.push_back(tempPoint);
-			}
-			if( fabs( x ) > 0.01 )
-			{ 
-				tempPoint[0]= -x; tempPoint[1]= y;	tempPoint[2]= 0.0;
-				positions.push_back(tempPoint);
-				if( fabs( y ) > 0.01 )
-				{
-					tempPoint[0]= -x; tempPoint[1]= -y;	tempPoint[2]= 0.0;
-					positions.push_back(tempPoint);
-				}
-			}
-			x += cell_spacing; 
-		}		
-		y += cell_spacing * sqrt(3.0)/2.0; 
-		n++; 
-	}
-	return positions;
+void post_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt){
+	return;
 }
 
-void inject_density_sphere(int density_index, double concentration, double membrane_lenght)
+/* Calculate repulsion/adhesion between agent and ecm according to its local density */
+void add_ecm_interaction(Cell* pC, int index_ecm, int index_voxel )
 {
-	// Inject given concentration on the extremities only
+	// Check if there is ECM material in given voxel
+	//double dens2 = get_microenvironment()->density_vector(index_voxel)[index_ecm];
+	double dens = pC->get_microenvironment()->nearest_density_vector(index_voxel)[index_ecm];
+	double ecmrad = sqrt(3.0) * pC->get_microenvironment()->mesh.dx * 0.5;
+	// if voxel is "full", density is 1
+	dens = std::min( dens, 1.0 ); 
+	if ( dens > EPSILON )
+	{
+		// Distance between agent center and ECM voxel center
+		pC->displacement = pC->position - microenvironment.mesh.voxels[index_voxel].center;
+		double distance = norm(pC->displacement);
+		// Make sure that the distance is not zero
+		distance = std::max(distance, EPSILON);
+		
+		double dd = pC->phenotype.geometry.radius + ecmrad;  
+		double dnuc = pC->phenotype.geometry.nuclear_radius + ecmrad;  
+
+		double tmp_r = 0;
+		// Cell overlap with ECM node, add a repulsion term
+		if ( distance < dd )
+		{
+			// repulsion stronger if nucleii overlap, see Macklin et al. 2012, 2.3.1
+			if ( distance < dnuc )
+			{
+				double M = 1.0;
+				double c = 1.0 - dnuc/dd;
+				c *= c;
+				c -= M;
+				tmp_r = c*distance/dnuc + M;
+				pC->custom_data["nucleus_deform"] += (dnuc-distance);
+			}
+			else
+			{
+				tmp_r = ( 1 - distance / dd );
+				tmp_r *= tmp_r;
+			}
+			tmp_r *= dens * PhysiCell::parameters.doubles("cell_ecm_repulsion");
+		}
+
+		// Cell adherence to ECM through integrins
+		double max_interactive_distance = (PhysiCell::parameters.doubles("max_interaction_factor")*pC->phenotype.geometry.radius) + ecmrad;
+		if ( distance < max_interactive_distance ) 
+		{	
+			double temp_a = 1 - distance/max_interactive_distance; 
+			temp_a *= temp_a; 
+			/* \todo change dens with a maximal density ratio ? */
+
+			pC->custom_data["ecm_contact"] += dens * (max_interactive_distance-distance);
+			// temp_a *= dens * ( static_cast<Cell*>(this) )->integrinStrength();
+
+			double temp_integrins = get_integrin_strength( pC->custom_data["pintegrin"] );
+
+			temp_a *= dens * temp_integrins;
+			
+			tmp_r -= temp_a;
+		}
+		
+		/////////////////////////////////////////////////////////////////
+		if(tmp_r==0)
+			return;
+		tmp_r/=distance;
+
+		axpy( &pC->velocity , tmp_r , pC->displacement ); 
+	}
+
+}
+
+void set_substrate_density(int density_index, double max, double min)
+{
+	std::cout << "SETTING SUBSTRATE \n";
+
+	std::cout << microenvironment.number_of_voxels() << "\n";
 	#pragma omp parallel for
 	for (int n = 0; n < microenvironment.number_of_voxels(); n++)
 	{
 		auto current_voxel = microenvironment.voxels(n);
-		std::vector<double> cent = {current_voxel.center[0], current_voxel.center[1], current_voxel.center[2]};
-
-		if ((membrane_lenght - norm(cent)) <= 0)
-			microenvironment.density_vector(n)[density_index] = concentration;
+		microenvironment.density_vector(n)[density_index] = current_value(min, max, uniform_random());
 	}
 }
 
-void remove_density(int density_index)
+	// FUNCTIONS TO PLOT CELLS
+
+std::string my_coloring_function_for_stroma( double concentration, double max_conc, double min_conc )
 {
-	for (int n = 0; n < microenvironment.number_of_voxels(); n++)
-		microenvironment.density_vector(n)[density_index] = 0;
+	 return paint_by_density_percentage( concentration,  max_conc,  min_conc); 
+
 }
 
-std::vector<std::string> my_coloring_function(Cell *pCell)
-{
-	// start with live coloring
-	std::vector<std::string> output = false_cell_coloring_live_dead(pCell);
+void EMT_knockout_function(){
 
-	// dead cells
-	if (pCell->phenotype.death.dead == false)
+	for (int i = 0; i < (*all_cells).size(); i++)
 	{
-		static int nR_EB = pCell->custom_data.find_variable_index("bound external TNFR");
-		float activation_threshold = pCell->custom_data.find_variable_index("TNFR activation threshold");
-
-		int bounded_tnf = (int)round((pCell->custom_data[nR_EB] / activation_threshold) * 255.0);
-		if (bounded_tnf > 0)
-		{
-			char szTempString[128];
-			sprintf(szTempString, "rgb(%u,%u,%u)", bounded_tnf, bounded_tnf, 255 - bounded_tnf);
-			output[0].assign("black");
-			output[1].assign(szTempString);
-			output[2].assign("black");
-			output[3].assign(szTempString);
-		}
+		std::string node_name = "EMT_knockout";
+		bool node_value = true;
+		// Access the current cell
+		Cell *pCell = (*all_cells)[i];
+		pCell->phenotype.intracellular->set_boolean_variable_value(node_name, node_value);
 	}
 
-	return output;
-}
+	return;
 
-
-double total_live_cell_count()
-{
-        double out = 0.0;
-
-        for( int i=0; i < (*all_cells).size() ; i++ )
-        {
-                if( (*all_cells)[i]->phenotype.death.dead == false && (*all_cells)[i]->type == 0 )
-                { out += 1.0; }
-        }
-
-        return out;
-}
-
-double total_dead_cell_count()
-{
-        double out = 0.0;
-
-        for( int i=0; i < (*all_cells).size() ; i++ )
-        {
-                if( (*all_cells)[i]->phenotype.death.dead == true && (*all_cells)[i]->phenotype.death.current_death_model_index == 0 )
-                { out += 1.0; }
-        }
-
-        return out;
-}
-
-double total_necrosis_cell_count()
-{
-        double out = 0.0;
-
-        for( int i=0; i < (*all_cells).size() ; i++ )
-        {
-                if( (*all_cells)[i]->phenotype.death.dead == true && (*all_cells)[i]->phenotype.death.current_death_model_index == 1 )
-                { out += 1.0; }
-        }
-
-        return out;
-}
-
-using namespace std;
-
-vector<double> vector_alives;
-
-bool auto_stop_resistance(int alive_cells, int resistant_cells) {
-    // Define stable states and nodes as vectors instead of unordered_sets
-
-	vector_alives.push_back(alive_cells);
-	std::cout << "Steps: " << vector_alives.size() << std::endl;
-
-    double threshold = 0.8;
-    double percentage_of_resistant = static_cast<double>(resistant_cells) / alive_cells;
-	std::cout << "Number of resistant: " << resistant_cells << std::endl;	
-
-    bool stop;
-	bool condition = false;
-	if (vector_alives.size() >= 4){
-	condition = percentage_of_resistant >= threshold;
-	}
-
-    if (condition) {
-        stop = true;
-    } else {
-        stop = false;
-    }
-    return stop;
-}
-
-bool auto_stop_alive(int alive_cells) {
-    //concatenate the number of alive cells to the vector
-	vector_alives.push_back(alive_cells);
-	std::cout << "Steps: " << vector_alives.size() << std::endl;
-
-	bool condition = false;
-	// check the number of elements inside the vector to decide if process it and compute the derivative
-	if (vector_alives.size() >= 8) {
-		std::vector<double> derivative;
-
-		// compute the derivative only for the last three steps
-		for (size_t i = vector_alives.size() - 4; i < vector_alives.size(); ++i) {
-			double slope = vector_alives[i] - vector_alives[i - 1];
-			derivative.push_back(slope);
-		}
-
-		condition = true;
-		for (double slope : derivative) {
-			// if the slope is less than or equal to zero, set condition to false
-			if (slope < 0) {
-				condition = false;
-				break;
-			}
-		}
-
-	} else {
-		condition = false;
-	}
-
-	bool stop;
-
-    if (condition) {
-        stop = true;
-    } else {
-        stop = false;
-    }
-    return stop;
-}
-
-int save_resistant_cells(ofstream& file_resistant){
-	//count the number of resistant cells for the plots
-	vector<vector<string>> stable_states = {
-        {"TNF", "TNFR", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
-        {"FASL", "TNF", "TNFR", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
-        {"TNF", "TNFR", "DISC-TNF", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
-        {"FASL", "DISC-FAS", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
-        {"FASL", "TNF", "TNFR", "DISC-TNF", "DISC-FAS", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"}
-    };
-
-    // Read the bool_data.txt file
-    ifstream file("start_and_stop_saving_files/bool_data.txt");
-    if (!file.is_open()) {
-        cerr << "Error opening file." << endl;
-        exit(1);
-    }
-
-    string line;
-    int counter_stable = 0;
-    while (getline(file, line)) {
-        istringstream iss(line);
-        string node;
-        vector<string> nodes; // Define nodes as a vector
-        while (iss >> node) {
-            size_t pos = node.find('=');
-            if (pos != string::npos) {
-                string key = node.substr(0, pos);
-                string value = node.substr(pos + 1);
-                if (value == "1") {
-                    nodes.push_back(key); // Push key to nodes vector
-                }
-            }
-        }
-
-        sort(nodes.begin(), nodes.end()); // Sort nodes vector
-
-        // Loop through stable_states vectors
-        for (auto& state : stable_states) {
-            sort(state.begin(), state.end()); // Sort each stable state vector
-            if (includes(nodes.begin(), nodes.end(), state.begin(), state.end())) {
-                counter_stable++;
-                break;
-            }
-        }
-    }
-	// save the number of resistant cells on a file 
-	
-	file_resistant << counter_stable << endl;
-	
-
-	return counter_stable;
 }
 
 bool auto_stop() {
 
 	bool condition = false;
 	bool stop;
-	// implement here your condition to stop the simulation
-
+	float stop_time = 1440;
+	if ((fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt) && (PhysiCell_globals.next_full_save_time == stop_time)) {
+		condition = true;
+	}
     if (condition) {
         stop = true;
     } else {
@@ -549,3 +430,4 @@ bool auto_stop() {
     }
     return stop;
 }
+

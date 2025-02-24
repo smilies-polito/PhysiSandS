@@ -400,11 +400,11 @@ std::string my_coloring_function_for_stroma( double concentration, double max_co
 
 }
 
-void EMT_inhibitor_function(){
+void EMT_knockout_function(){
 
 	for (int i = 0; i < (*all_cells).size(); i++)
 	{
-		std::string node_name = "EMT_inhibitor";
+		std::string node_name = "EMT_knockout";
 		bool node_value = true;
 		// Access the current cell
 		Cell *pCell = (*all_cells)[i];
@@ -419,16 +419,8 @@ bool auto_stop() {
 
 	bool condition = false;
 	bool stop;
-	int threshold = 40;
-	int count = 0;
-	// implement here your condition to stop the simulation
-	for (int i = 0; i < (*all_cells).size(); i++){
-		Cell* pCell = (*all_cells)[i];
-		if (pCell->type_name == "mesenchymal"){
-		count++;
-		}
-	}
-	if (count >= threshold){
+	float stop_time = 1440;
+	if ((fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt) && (PhysiCell_globals.next_full_save_time == stop_time)) {
 		condition = true;
 	}
     if (condition) {

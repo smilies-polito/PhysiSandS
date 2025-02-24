@@ -23,12 +23,17 @@
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
 #     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
-#     DOI: 10.1371/jourgs.full_save_interval;                                                      #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
+#                                                                             #
+# [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
+#     llelized diffusive transport solver for 3-D biological simulations,     #
+#     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730  #
+#                                                                             #
 ###############################################################################
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -60,62 +65,42 @@
 ###############################################################################
 */
 
-#include <sstream>
-
 #include "../core/PhysiCell.h"
-#include "../modules/PhysiCell_standard_modules.h"
-
-#include "./tnf_receptor_dynamics.h"
-#include "./tnf_boolean_model_interface.h"
-#include "../addons/start_and_stop/start_and_stop.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
 using namespace BioFVM; 
 using namespace PhysiCell;
+#include "custom_main.h"
 
 // setup functions to help us along 
+
 void create_cell_types( void );
 void setup_tissue( void ); 
-void setup_tissue_input(void);
 
 // set up the BioFVM microenvironment 
 void setup_microenvironment( void ); 
 
-// helper function to read init files
-std::vector<std::vector<double>>  read_cells_positions(std::string filename, char delimiter, bool header);
+// custom functions can go here 
 
-// helper function to create a sphere of cells of a given radius
-std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius, double sphere_radius);
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
+void set_substrate_density(int density_index, double max, double min);
 
-// helper function to create a disc of cells of a given radius
-std::vector<std::vector<double>> create_cell_disc_positions(double cell_radius, double disc_radius);
+/** \brief Get the current value of integrin strength */
+inline double get_integrin_strength( double percent )
+{ return current_value( PhysiCell::parameters.doubles("ecm_adhesion_min"), PhysiCell::parameters.doubles("ecm_adhesion_max"), percent ); };
 
-// helper function that calculates phere volume
-inline float sphere_volume_from_radius(float radius) {return 4/3 * PhysiCell_constants::pi * std::pow(radius, 3);}
+/** \brief Get the current value of motility coefficient */
+inline double get_motility_amplitude( double percent )
+{ return current_value(PhysiCell::parameters.doubles("motility_amplitude_min"), PhysiCell::parameters.doubles("motility_amplitude_max"), percent ); };
 
-// helper function to inject density surrounding a spheroid
-void inject_density_sphere(int density_index, double concentration, double membrane_lenght);
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
-// helper function to remove a density
-void remove_density( int density_index );
+void add_ecm_interaction( Cell* pCell, int index_ecm, int index_voxel );
+void pre_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt);
+void post_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt);
 
-// custom pathology coloring function 
-std::vector<std::string> my_coloring_function( Cell* );
-
-double total_live_cell_count();
-
-// count the number of total dead cells at current time step
-double total_dead_cell_count();
-
-// count the number of necrotic cells at current time step
-double total_necrosis_cell_count();
-
-// function to auto stop the simulation
-bool auto_stop_resistance(int alive_cells, int resistant_cells);
-bool auto_stop_alive(int alive_cells);
-int save_resistant_cells(std::ofstream& file_resistant);
-void update_variables_monitor();
+std::string my_coloring_function_for_stroma( double concentration, double max_conc, double min_conc );
+void color_node(Cell* pCell);
+void EMT_knockout_function();
 bool auto_stop();
-
-
-
-

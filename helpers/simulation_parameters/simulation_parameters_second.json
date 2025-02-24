@@ -27,8 +27,8 @@
         "value": "false",
         "path": "user_parameters/auto_stop"
     },
-    "EMT_inhibitor": {
+    "EMT_knockout": {
         "value": "true",
-        "path": "user_parameters/EMT_inhibitor"
+        "path": "user_parameters/EMT_knockout"
     }
 }

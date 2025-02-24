@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -74,10 +74,12 @@
 #include <fstream>
 
 #include "./core/PhysiCell.h"
-#include "./core/PhysiCell_utilities.h"
 #include "./modules/PhysiCell_standard_modules.h" 
-#include "./addons/PhysiBoSS/src/maboss_intracellular.h"	
+
+// put custom code modules here! 
+
 #include "./custom_modules/custom.h" 
+#include "./addons/PhysiBoSS/src/maboss_intracellular.h"	
 
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -85,18 +87,19 @@ using namespace PhysiCell;
 int main( int argc, char* argv[] )
 {
 	// load and parse settings file(s)
-	std::ofstream file_resistant("output/resistant_cells.txt", std::ios::app);
 	
 	bool XML_status = false; 
 	char copy_command [1024]; 
+	char copy_command_2 [1024];
 	if( argc > 1 )
-	{ 
+	{
 		XML_status = load_PhysiCell_config_file( argv[1] ); 
-		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
-		}
+		sprintf( copy_command , "cp %s %s/PhysiCell_settings.xml" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+		sprintf( copy_command_2 , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+	}
 	else
-	{ 
-		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); 
+	{
+		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
 		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() ); 
 	}
 	if( !XML_status )
@@ -104,12 +107,14 @@ int main( int argc, char* argv[] )
 	
 	// copy config file to output directry 
 	system( copy_command ); 
-
+	
+	if ( argc > 1 )
+	{
+		system( copy_command_2 );
+	}
+	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
-	
-	// PNRG setup 
-	SeedRandom(); // or specify a seed here
 	
 	// time setup 
 	std::string time_units = "min"; 
@@ -119,27 +124,8 @@ int main( int argc, char* argv[] )
 	setup_microenvironment(); // modify this in the custom code 
 
 	bool start_stop = parameters.bools("start_stop");
-	if( start_stop ){
+	bool EMT_knockout = parameters.bools("EMT_knockout");
 	
-		// reset microenvironment and cells as they were in the previous simulation
-		reset_microenv();
-	}
-
-
-	// User parameters
-	
-	double tnf_pulse_period = parameters.doubles("tnf_pulse_period");
-	double tnf_pulse_duration = parameters.doubles("tnf_pulse_duration");
-	double tnf_pulse_concentration = parameters.doubles("tnf_pulse_concentration");
-	double time_remove_tnf = parameters.doubles("time_remove_tnf");
-	double membrane_lenght = parameters.doubles("membrane_length"); // radious around which the tnf pulse is injected
-	
-	
-	double tnf_pulse_timer = tnf_pulse_period;
-	double tnf_pulse_injection_timer = tnf_pulse_duration; // tnf_pulse_duration; // -1;
-	static int tnf_idx = microenvironment.find_density_index("tnf");	
-
-
 	/* PhysiCell setup */ 
  	
 	// set mechanics voxel size, and match the data structure to BioFVM
@@ -147,15 +133,12 @@ int main( int argc, char* argv[] )
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
 	/* Users typically start modifying here. START USERMODS */ 
+	
 	create_cell_types();
 
-	
 	if( start_stop ){
 
 
-		parameters.bools("read_init") = true;
-
-		// reset cells as they were in the previous simulation
 		setup_tissue();
 
 		reset_cell(cell_container->last_cell_cycle_time);
@@ -165,24 +148,18 @@ int main( int argc, char* argv[] )
 
 		reset_global_parameters(cell_container);
 
-		update_variables_monitor();
+		reset_microenv();
+
 
 
 	} else{
 		setup_tissue(); //death model index = 1 == necrotic...= 0 == apoptotic.
 	}
-	
 
-	// check if we want to start injecting tnf
-	if(parameters.bools("if_start_inj")){
-
-		tnf_pulse_timer = PhysiCell_globals.current_time;
-
-	}else{
-
-		tnf_pulse_timer  = PhysiCell_globals.current_time + tnf_pulse_period;
-	}	
-
+	if( EMT_knockout){
+		EMT_knockout_function();
+	}
+	/* Users typically stop modifying here. END USERMODS */ 
 	
 	// set MultiCellDS save options 
 
@@ -195,11 +172,7 @@ int main( int argc, char* argv[] )
 	
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
-	
 	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
-	
-	sprintf( filename , "%s/states_initial.csv", PhysiCell_settings.folder.c_str());
-	MaBoSSIntracellular::save(filename);
 	
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
@@ -208,19 +181,21 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function;
-	
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = paint_by_number_cell_coloring; 
+	std::string (*ECM_coloring_function)(double, double, double) = my_coloring_function_for_stroma; 
+
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
-	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, ECM_coloring_function);
 	
 	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
 	create_plot_legend( filename , cell_coloring_function ); 
-	
-	add_software_citation( "PhysiBoSS" , PhysiBoSS_Version , PhysiBoSS_DOI, PhysiBoSS_URL);  
-	
+
+	add_software_citation( "PhysiBoSS" , PhysiBoSS_Version , PhysiBoSS_DOI, PhysiBoSS_URL); 
+
 	display_citations(); 
 	
 	// set the performance timers 
+
 	BioFVM::RUNTIME_TIC();
 	BioFVM::TIC();
 	
@@ -240,8 +215,9 @@ int main( int argc, char* argv[] )
 
 	//define auto stop variable
 	bool stop = false;
-
-	// main loop
+	
+	// main loop 
+	
 	try 
 	{		
 		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt && stop!=true)
@@ -249,64 +225,28 @@ int main( int argc, char* argv[] )
 			// save data if it's time. 
 			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt )
 			{
-				std::cout << "Time to save, current time: " << PhysiCell_globals.current_time << std::endl;
 				display_simulation_status( std::cout ); 
 				if( PhysiCell_settings.enable_legacy_saves == true )
 				{	
 					log_output( PhysiCell_globals.current_time , PhysiCell_globals.full_output_index, microenvironment, report_file);
-					//Count Necrotic Apoptotic Alive cells
-					// Producer
-					std::string message;
-					std::string topic_name = "cells";
-					double timepoint = PhysiCell_globals.current_time;
-					int alive_no,necrotic_no,apoptotic_no=0;
-					alive_no = total_live_cell_count();
-					necrotic_no = total_necrosis_cell_count();
-					apoptotic_no = total_dead_cell_count();
-					pid_t pid_var = getpid();
-					message = std::to_string(pid_var) + ';' + std::to_string(timepoint) + ';' + std::to_string(alive_no) + ';' + std::to_string(apoptotic_no) + ';' + std::to_string(necrotic_no) + ';';
 				}
 				
 				if( PhysiCell_settings.enable_full_saves == true )
 				{	
 					save_cell_microenv_data(cell_container);
 					std::cout << "cells data saved succesfully" << std::endl;
-
+					
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
 					save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
-					
-					sprintf( filename , "%s/states_%08u.csv", PhysiCell_settings.folder.c_str(), PhysiCell_globals.full_output_index);
-					
-					MaBoSSIntracellular::save(filename);
-					
-					// add test necessities, not necessary for the correct functioning of the model
-
-					int resistant_cells = save_resistant_cells(file_resistant);
-					if(parameters.bools("auto_stop")){
-
-						int alive = total_live_cell_count();
-
-						if(parameters.bools("auto_stop_resistance")){
-							
-							//auto stop condition (resistance)
-							stop = auto_stop_resistance(alive, resistant_cells);
-							if (stop){
-								std::cout << "auto stop resistance condition activated, simulation interrupted." << std::endl;
-							}
-						}else{
-
-							//auto stop condition (alive)
-							stop = auto_stop_alive(alive);
-							if (stop){
-								std::cout << "auto stop alive condition activated, simulation interrupted." << std::endl;
-							}
-						}
-					}
+					if ( parameters.bools("auto_stop") ){
+						stop = auto_stop();
 				}
-
+				}
+				
 				PhysiCell_globals.full_output_index++; 
 				PhysiCell_globals.next_full_save_time += PhysiCell_settings.full_save_interval;
+
 			}
 			
 			// save SVG plot if it's time
@@ -315,50 +255,26 @@ int main( int argc, char* argv[] )
 				if( PhysiCell_settings.enable_SVG_saves == true )
 				{	
 					sprintf( filename , "%s/snapshot%08u.svg" , PhysiCell_settings.folder.c_str() , PhysiCell_globals.SVG_output_index ); 
-					SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+					SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, ECM_coloring_function);
 					
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
 			}
 
-			/*
-			  Custom add-ons could potentially go here. 
-			*/			
-			if ( PhysiCell_globals.current_time >= tnf_pulse_timer )
-			{
-				tnf_pulse_injection_timer = PhysiCell_globals.current_time + tnf_pulse_duration;
-				tnf_pulse_timer += tnf_pulse_period;
-			}
-
-			if ( PhysiCell_globals.current_time <= tnf_pulse_injection_timer )
-			{
-				
-				inject_density_sphere(tnf_idx, tnf_pulse_concentration, membrane_lenght);
-
-			}
-
-			if ( PhysiCell_globals.current_time >= time_remove_tnf )
-			{
-
-				remove_density(tnf_idx);
-				time_remove_tnf += PhysiCell_settings.max_time;
-			}
-
-				
-
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
-			
-			// update te TNF receptor model of each cell
-			tnf_receptor_model_main( diffusion_dt );
 			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
+			/*
+			  Custom add-ons could potentially go here. 
+			*/
+			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
-
+		
 		if( PhysiCell_settings.enable_legacy_saves == true )
 		{			
 			log_output(PhysiCell_globals.current_time, PhysiCell_globals.full_output_index, microenvironment, report_file);
@@ -375,19 +291,13 @@ int main( int argc, char* argv[] )
 	sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
 	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
-	sprintf( filename , "%s/states_final.csv", PhysiCell_settings.folder.c_str());
-	MaBoSSIntracellular::save(filename);
-	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
-	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
-
+	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, ECM_coloring_function);
 	
 	// timer 
 	
 	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
 	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
-
-	file_resistant.close();
 
 	return 0; 
 }

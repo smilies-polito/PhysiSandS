@@ -672,7 +672,7 @@
     <user_parameters>
     	<start_stop type="bool" units="">false</start_stop>
         <auto_stop type="bool" units="">true</auto_stop>
-        <EMT_inhibitor type="bool" units="" description="set to true to inhibit EMT">false</EMT_inhibitor>
+        <EMT_knockout type="bool" units="" description="set to true to inhibit EMT">false</EMT_knockout>
 
         <random_seed type="int" units="dimensionless" description="">0</random_seed>
         <tumor_radius type="double" units="micron" description="">30.0</tumor_radius>

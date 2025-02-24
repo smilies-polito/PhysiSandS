@@ -273,9 +273,9 @@ Node VIM {
   rate_down = @logic ? 0.0 : $d_VIM;
 }
 
-// added the inibition by EMT_inhibitor
+// added the inibition by EMT_knockout
 Node EMT {
-  logic = ((!CDH1 & CDH2) & !EMT_inhibitor);
+  logic = ((!CDH1 & CDH2) | EMT & (!CDH1 & CDH2)) & !EMT_knockout;
   rate_up = @logic ? $u_EMT : 0.0;
   rate_down = @logic ? 0.0 : $d_EMT;
 }
@@ -304,11 +304,11 @@ Node Apoptosis {
   rate_down = @logic ? 0.0 : $d_Apoptosis;
 }
 
-// added our EMT_inhibitor node
-Node EMT_inhibitor {
+// added our EMT_knockout node
+Node EMT_knockout {
   logic = 0;
-  rate_up = $u_EMT_inhibitor;
-  rate_down = $d_EMT_inhibitor;
+  rate_up = $u_EMT_knockout;
+  rate_down = $d_EMT_knockout;
 }
 
 

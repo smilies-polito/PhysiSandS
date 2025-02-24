@@ -1,6 +1,7 @@
 import json
 import matplotlib.pyplot as plt
 import os
+import sys
 
 def time_plot(quantitative_test, quantitative_test_second, output_folder):
 
@@ -43,7 +44,7 @@ def time_plot(quantitative_test, quantitative_test_second, output_folder):
     # Etichette e titolo
     ax.set_ylabel('CPU time (sec)')
     ax.set_xlabel('Test Type')
-    ax.set_title('Comparison of Normal and Start and Stop CPU time')
+    ax.set_title('Start&Stop impact in terms of computational time')
     
     # Regolare i margini per evitare che le etichette vengano tagliate
     plt.tight_layout()
@@ -53,7 +54,12 @@ def time_plot(quantitative_test, quantitative_test_second, output_folder):
 
 
 if __name__ == '__main__':
-    quantitative_test = '/home/danariki/OneDrive/ph.D/PoliTo/PhysiBoss2.0/addon_paper/add-on_tests/quantitative_test.json'
-    quantitative_test_second = '/home/danariki/OneDrive/ph.D/PoliTo/PhysiBoss2.0/addon_paper/add-on_tests/quantitative_test_second.json'
-    output_folder = '/home/danariki/OneDrive/ph.D/PoliTo/PhysiBoss2.0/addon_paper/add-on_tests/'
+    if len(sys.argv) != 4:
+        print("Usage: python script.py <quantitative_test.json> <quantitative_test_second.json> <output_folder>")
+        sys.exit(1)
+
+    quantitative_test = sys.argv[1]
+    quantitative_test_second = sys.argv[2]
+    output_folder = sys.argv[3]
+    
     time_plot(quantitative_test, quantitative_test_second, output_folder)

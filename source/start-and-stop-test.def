@@ -38,7 +38,7 @@ From: ubuntu:22.04
         echo "usage: singularity run container.sif /path/to/your/output/folder"
         exit 1
     fi
-    output_folder="$1"
+    output_folder=$(realpath "$1")
 
     cd ../test
     

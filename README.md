@@ -13,12 +13,12 @@ git clone https://github.com/smilies-polito/start-and-stop-test
 
 3) Move to the source subfolder, and build the start-and-stop-test Singularity container with 
 ```bash
-cd optimizing-physiboss/source
+cd start-and-stop-test/source
 sudo singularity build start-and-stop-test.sif start-and-stop-test.def
 ```
 or using fake root privileges
 ```bash
-cd optimizing-physiboss/source
+cd start-and-stop-test/source
 singularity build --fakeroot start-and-stop-test.sif start-and-stop-test.def
 ```
 

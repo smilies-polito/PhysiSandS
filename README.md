@@ -45,7 +45,7 @@ This utility test demonstrates a practical use of the Start & Stop add-on by all
 To run the utility test, navigate to the test folder and execute the utility_test.py script, specifying the folder where you want the test output to be saved and an image, as shown in Figure 4 of the paper.
 ```bash
 Singularity> cd ../test
-Singularity> python utility_test.py /path/to/yout/output/folder/
+Singularity> python utility_test.py /path/to/your/output/folder/
 ```
 
 #### Quantitative Test on the first use case
@@ -53,7 +53,7 @@ Singularity> python utility_test.py /path/to/yout/output/folder/
 This quantitative test is performed to ensure that the Start & Stop add-on does not introduce biases into the simulator. To run the quantitative test, follow the same steps as for the utility test, but execute the quantitative_test.py script instead.
 ```bash
 Singularity> cd ../test
-Singularity>python quantitative_test.py /path/to/yout/output/folder/
+Singularity>python quantitative_test.py /path/to/your/output/folder/
 ```
 
 #### Utility Test on the second use case
@@ -63,7 +63,7 @@ This utility test demonstrates a practical use of the Start & Stop add-on by all
 To run the utility test, navigate to the test folder and execute the utility_test_second.py script, specifying the folder where you want the test output to be saved and an image, as shown in the paper.
 ```bash
 Singularity> cd ../test
-Singularity> python utility_test_second.py /path/to/yout/output/folder/
+Singularity> python utility_test_second.py /path/to/your/output/folder/
 ```
 
 #### Quantitative Test on the second use case
@@ -71,14 +71,14 @@ Singularity> python utility_test_second.py /path/to/yout/output/folder/
 This quantitative test is performed to ensure that the Start & Stop add-on does not introduce biases into the simulator. To run the quantitative test, follow the same steps as for the utility test, but execute the quantitative_test_second.py script instead.
 ```bash
 Singularity> cd ../test
-Singularity>python quantitative_test_second.py /path/to/yout/output/folder/
+Singularity>python quantitative_test_second.py /path/to/your/output/folder/
 ```
 
 ### Computational Times comparison
-To save an image which compares the different times for continuous simulations and simulations subjected to multiple stops and restart, move into the helpers/plots folder and execute the time_plot.py sctipt by providing both the json files containing the outputs of both the quantitative tests and the output folder as following.
+To save an image comparing the different execution times of continuous simulations and simulations with multiple stops and restarts, navigate to the helpers/plots folder and execute the time_plot.py script. Provide both JSON files containing the outputs of the quantitative tests and specify the output folder as follows.
 ```bash
 Singularity> cd ../helpers/plots
-Singularity>python time_plot.py /path/to/yout/quantitative_test.json /path/to/yout/quantitative_test_second.json /path/to/yout/output/folder/
+Singularity>python time_plot.py /path/to/your/quantitative_test.json /path/to/your/quantitative_test_second.json /path/to/your/output/folder/
 ```
 
 ## Reproducing the analysis running the start-and-stop-test Singularity container

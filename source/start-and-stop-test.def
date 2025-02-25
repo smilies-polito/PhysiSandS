@@ -42,9 +42,19 @@ From: ubuntu:22.04
 
     cd ../test
     
-    # run the utility_test
+    # run the utility test for the first use case
     python utility_test.py "$output_folder" 
 
-    # run the quantitative test
+    # run the quantitative test for the first use case
     python quantitative_test.py "$output_folder"
+
+    # run the utility test for the second use case
+    python utility_test_second.py "$output_folder" 
+
+    # run the quantitative test for the first use case
+    python quantitative_test_second.py "$output_folder"
+
+    # run the time plot
+    cd ../helpers/plots
+    python time_plot.py "$output_folder/quantitative_test.json" "$output_folder/quantitative_test_second.json" "$output_folder"
 

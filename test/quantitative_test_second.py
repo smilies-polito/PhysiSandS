@@ -102,7 +102,7 @@ def create_combined_boxplots(output_dir):
             loc = 'lower right'
         else:
             loc = 'upper right'
-        ax.legend(boxplot_elements, ['Normal', 'Start-Stop'], loc=loc, fontsize=8)  # Reduced font size
+        ax.legend(boxplot_elements, ['Continuous', 'Start-Stop'], loc=loc, fontsize=8)  # Reduced font size
 
     # Adjust the layout to make room for the main title
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])

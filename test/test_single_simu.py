@@ -120,6 +120,8 @@ def test_single_simu_second(num_simu, step, two_D, resistance=False):
     # update parameters according to the current ideal simulation
     parameter_dict['start_stop']['value'] = 'false'
     parameter_dict['initial_conditions']['value'] = './config'
+    parameter_dict['auto_stop']['value'] = 'false'
+    parameter_dict['EMT_knockout']['value'] = 'false'
 
     with open(json_file_path, 'w') as file:
         json.dump(parameter_dict, file, indent=4)

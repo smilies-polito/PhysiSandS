@@ -120,12 +120,11 @@ def quantitative_test(output_dir):
 
     two_D = True
 
-
-    epithelial_s_s, mesenchymal_s_s, durations_ss = test_start_and_stop_second(num_simu, step, two_D)
+    epithelial, mesenchymal, durations = test_single_simu_second(num_simu, step, two_D)
 
     os.chdir(dir)
-
-    epithelial, mesenchymal, durations = test_single_simu_second(num_simu, step, two_D)
+    
+    epithelial_s_s, mesenchymal_s_s, durations_ss = test_start_and_stop_second(num_simu, step, two_D)
 
     data = {
         'epithelial': epithelial,

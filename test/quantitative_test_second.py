@@ -114,25 +114,31 @@ def create_combined_boxplots(output_dir):
 def quantitative_test(output_dir):
     dir = os.getcwd()
 
-    num_simu = 50
+    num_simu = 2
 
     step = 600
 
     two_D = True
 
-    epithelial, mesenchymal, durations = test_single_simu_second(num_simu, step, two_D)
+    epithelial, mesenchymal, T_save, T_reload, T_total, T_main = test_single_simu_second(num_simu, step, two_D)
 
     os.chdir(dir)
     
-    epithelial_s_s, mesenchymal_s_s, durations_ss = test_start_and_stop_second(num_simu, step, two_D)
+    epithelial_s_s, mesenchymal_s_s, T_save_ss, T_reload_ss, T_total_ss, T_main_ss = test_start_and_stop_second(num_simu, step, two_D)
 
     data = {
         'epithelial': epithelial,
         'mesenchymal': mesenchymal,
-        'Durations': durations,
+        'T_save': T_save,
+        'T_reload': T_reload,
+        'T_total': T_total,
+        'T_main': T_main,
         'epithelial_Start_Stop': epithelial_s_s,
         'mesenchymal_Start_Stop': mesenchymal_s_s,
-        'Durations_Start_Stop': durations_ss
+        'T_save_ss': T_save_ss,
+        'T_reload_ss': T_reload_ss,
+        'T_total_ss': T_total_ss,
+        'T_main_ss': T_main_ss
     }
     
     data = convert_int64(data)

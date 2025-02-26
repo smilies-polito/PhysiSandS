@@ -1,6 +1,7 @@
 import sys
 import os
 import time
+import pandas as pd
 sys.path.append('../')
 from simulations.start_stop_simulation import start_stop_simu, start_stop_simu_second
 import math
@@ -12,6 +13,12 @@ def test_start_and_stop(num_simu, step, two_D):
     step_alive = []
     step_necrotic = []
     step_apoptotic = []
+    T_save = []
+    T_reload = []
+    T_total = []
+    T_main = []
+
+
 
     current_time = 0
     duration = 1440
@@ -31,8 +38,6 @@ def test_start_and_stop(num_simu, step, two_D):
     data_to_plot_alive = []
     data_to_plot_necrotic = []
     data_to_plot_apoptotic = []
-    durations = []
-    counters = []
 
     for i in stops:
         data_to_plot_alive.append([])
@@ -41,17 +46,23 @@ def test_start_and_stop(num_simu, step, two_D):
 
     for sim in range(num_simu):
 
-        ini = time.process_time()
         time_steps_flag, step_alive_flag, step_necrotic_flag, step_apoptotic_flag, percentage_of_resistant, stable_cells = start_stop_simu(step, two_D)
-        fin = time.process_time()
 
-        duration = fin - ini
+        times_df = pd.read_csv('output/interesting_times.txt', sep=' ', header=None)
+        T_save_flag = times_df.iloc[:,0].values.tolist()
+        T_reload_flag = times_df.iloc[:,1].values.tolist()
+        T_total_flag = times_df.iloc[:,2].values.tolist()
+        T_main_flag= times_df.iloc[:,3].values.tolist()
+        T_save.append(T_save_flag)
+        T_reload.append(T_reload_flag)
+        T_total.append(T_total_flag)
+        T_main.append(T_main_flag)
+
 
         time_steps.append(time_steps_flag)
         step_alive.append(step_alive_flag)
         step_necrotic.append(step_necrotic_flag)
         step_apoptotic.append(step_apoptotic_flag)
-        durations.append(duration)
 
         n = 0
         for stop in stops:
@@ -66,7 +77,7 @@ def test_start_and_stop(num_simu, step, two_D):
 
             n+=1
 
-    return data_to_plot_alive, data_to_plot_apoptotic, data_to_plot_necrotic, durations
+    return data_to_plot_alive, data_to_plot_apoptotic, data_to_plot_necrotic, T_save, T_reload, T_total, T_main
 
 
 def test_start_and_stop_second(num_simu, step, two_D):
@@ -75,6 +86,10 @@ def test_start_and_stop_second(num_simu, step, two_D):
     time_steps = []
     step_epithelial = []
     step_mesenchymal = []
+    T_save = []
+    T_reload = []
+    T_total = []
+    T_main = []
     current_time = 0
     duration = 2880
 
@@ -92,8 +107,6 @@ def test_start_and_stop_second(num_simu, step, two_D):
 
     data_to_plot_epithelial = []
     data_to_plot_mesenchymal = []
-    durations = []
-    counters = []
 
     for i in stops:
         data_to_plot_epithelial.append([])
@@ -102,16 +115,23 @@ def test_start_and_stop_second(num_simu, step, two_D):
     for sim in range(num_simu):
         os.chdir(current_dir)
 
-        ini = time.process_time()
         time_steps_flag, step_epithelial_flag, step_mesenchymal_flag = start_stop_simu_second(step, two_D)
-        fin = time.process_time()
 
-        duration = fin - ini
+        times_df = pd.read_csv('output/interesting_times.txt', sep=' ', header=None)
+        T_save_flag = times_df.iloc[:,0].values.tolist()
+        T_reload_flag = times_df.iloc[:,1].values.tolist()
+        T_total_flag = times_df.iloc[:,2].values.tolist()
+        T_main_flag = times_df.iloc[:,3].values.tolist()
+
+        T_save.append(T_save_flag)
+        T_reload.append(T_reload_flag)
+        T_total.append(T_total_flag)
+        T_main.append(T_main_flag)
+
 
         time_steps.append(time_steps_flag)
         step_epithelial.append(step_epithelial_flag)
         step_mesenchymal.append(step_mesenchymal_flag)
-        durations.append(duration)
 
         n = 0
         for stop in stops:
@@ -124,7 +144,7 @@ def test_start_and_stop_second(num_simu, step, two_D):
             
             n+=1
 
-    return data_to_plot_epithelial, data_to_plot_mesenchymal, durations
+    return data_to_plot_epithelial, data_to_plot_mesenchymal, T_save, T_reload, T_total, T_main
 
 
 

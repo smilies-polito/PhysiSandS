@@ -128,19 +128,26 @@ def quantitative_test(output_dir):
 
     two_D = True
 
-    alive, apoptotic, necrotic, durations = test_single_simu(num_simu, step, two_D)
+    alive, apoptotic, necrotic, T_save, T_reload, T_total, T_main = test_single_simu(num_simu, step, two_D)
 
-    alive_s_s, apoptotic_s_s, necrotic_s_s, durations_ss = test_start_and_stop(num_simu, step, two_D)
+    alive_s_s, apoptotic_s_s, necrotic_s_s, T_save_ss, T_reload_ss, T_total_ss, T_main_ss = test_start_and_stop(num_simu, step, two_D)
 
     data = {
         'Alive': alive,
         'Apoptotic': apoptotic,
         'Necrotic': necrotic,
-        'Durations': durations,
+        'T_save': T_save,
+        'T_reload': T_reload,
+        'T_total': T_total,
+        'T_main': T_main,
         'Alive_Start_Stop': alive_s_s,
         'Apoptotic_Start_Stop': apoptotic_s_s,
         'Necrotic_Start_Stop': necrotic_s_s,
-        'Durations_Start_Stop': durations_ss
+        'T_save_ss': T_save_ss,
+        'T_reload_ss': T_reload_ss,
+        'T_total_ss': T_total_ss,
+        'T_main_ss': T_main_ss
+
     }
     
     data = convert_int64(data)

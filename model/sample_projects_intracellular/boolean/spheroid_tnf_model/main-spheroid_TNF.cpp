@@ -269,9 +269,6 @@ int main( int argc, char* argv[] )
 				
 				if( PhysiCell_settings.enable_full_saves == true )
 				{	
-					save_cell_microenv_data(cell_container);
-					std::cout << "cells data saved succesfully" << std::endl;
-
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
 					save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
@@ -282,12 +279,12 @@ int main( int argc, char* argv[] )
 					
 					// add test necessities, not necessary for the correct functioning of the model
 
-					int resistant_cells = save_resistant_cells(file_resistant);
 					if(parameters.bools("auto_stop")){
 
 						int alive = total_live_cell_count();
 
 						if(parameters.bools("auto_stop_resistance")){
+							int resistant_cells = save_resistant_cells(file_resistant);
 							
 							//auto stop condition (resistance)
 							stop = auto_stop_resistance(alive, resistant_cells);
@@ -308,6 +305,7 @@ int main( int argc, char* argv[] )
 				PhysiCell_globals.full_output_index++; 
 				PhysiCell_globals.next_full_save_time += PhysiCell_settings.full_save_interval;
 			}
+
 			
 			// save SVG plot if it's time
 			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_SVG_save_time  ) < 0.01 * diffusion_dt )
@@ -344,7 +342,7 @@ int main( int argc, char* argv[] )
 				remove_density(tnf_idx);
 				time_remove_tnf += PhysiCell_settings.max_time;
 			}
-
+			
 				
 
 			// update the microenvironment
@@ -381,6 +379,9 @@ int main( int argc, char* argv[] )
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 
+	// Save all the files needed for Start & Stop at the right point.
+	save_cell_microenv_data(cell_container);
+	std::cout << "cells data saved successfully" << std::endl;
 	
 	// timer 
 	

@@ -233,9 +233,7 @@ int main( int argc, char* argv[] )
 				
 				if( PhysiCell_settings.enable_full_saves == true )
 				{	
-					save_cell_microenv_data(cell_container);
-					std::cout << "cells data saved succesfully" << std::endl;
-					
+
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
 					save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
@@ -293,6 +291,10 @@ int main( int argc, char* argv[] )
 	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, ECM_coloring_function);
+
+	// save the necessary files for the start and stop add-on
+	save_cell_microenv_data(cell_container);
+	std::cout << "cells data saved succesfully" << std::endl;
 	
 	// timer 
 	

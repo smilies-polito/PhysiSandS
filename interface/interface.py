@@ -275,8 +275,8 @@ class interface:
         if resistance:
             df = pd.read_csv('../model/output/resistant_cells.txt', header=None)
             resistant_cells = df.values.flatten().tolist()
-            if stop:
-                resistant_cells.pop(round(stop_time/30))
+            #if stop:
+                #resistant_cells.pop(round(stop_time/30))
 
             # Create stackplot with resistance
             ax.stackplot(time_steps, list(np.array(step_alive)-np.array(resistant_cells)), resistant_cells, step_necrotic, step_apoptotic, colors=[color_alive, color_resistant, color_necrotic, color_apoptotic], labels=['Alive Cells', 'Resistant Cells', 'Necrotic Cells', 'Apoptotic Cells'])

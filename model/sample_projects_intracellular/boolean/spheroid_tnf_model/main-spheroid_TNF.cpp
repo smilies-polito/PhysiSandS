@@ -138,6 +138,7 @@ int main( int argc, char* argv[] )
 	double tnf_pulse_timer = tnf_pulse_period;
 	double tnf_pulse_injection_timer = tnf_pulse_duration; // tnf_pulse_duration; // -1;
 	static int tnf_idx = microenvironment.find_density_index("tnf");	
+	int resistant_cells = 0;
 
 
 	/* PhysiCell setup */ 
@@ -279,12 +280,14 @@ int main( int argc, char* argv[] )
 					
 					// add test necessities, not necessary for the correct functioning of the model
 
+					resistant_cells = save_resistant_cells(file_resistant);
+
+
 					if(parameters.bools("auto_stop")){
 
 						int alive = total_live_cell_count();
 
 						if(parameters.bools("auto_stop_resistance")){
-							int resistant_cells = save_resistant_cells(file_resistant);
 							
 							//auto stop condition (resistance)
 							stop = auto_stop_resistance(alive, resistant_cells);

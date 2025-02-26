@@ -51,7 +51,6 @@ def create_combined_stackplot(output_dir):
     # Loop attraverso ogni subplot e plotta i dati
     for i, ax in enumerate(axs.flat):
         if stop_times[i] is not None:
-            resistant_cells_vec[i].pop(round(stop_times[i]/30))
             ax.axvline(x=stop_times[i], color='r', linestyle='--', label='Stop Time')
         ax.stackplot(time_steps_tot[i], list(np.array(step_alive_tot[i]) - np.array(resistant_cells_vec[i])), 
                      resistant_cells_vec[i], step_necrotic_tot[i], step_apoptotic_tot[i], 
@@ -167,7 +166,7 @@ def qualitative_test(output_dir):
     #print(len(time_steps))
 
     # Execute plot
-    my_interface.plot(time_steps_ss_alive, step_alive_ss_alive, step_necrotic_ss_alive, step_apoptotic_ss_alive, pos_ss_alive, resistance=True, stop_time=stop_time_ss_alive, stop=True)
+    my_interface.plot(time_steps_ss_alive, step_alive_ss_alive, step_necrotic_ss_alive, step_apoptotic_ss_alive, pos_ss_alive, resistance=True, stop_time=stop_time_ss_alive)
 
     # ----------------------------------------#
     # CONTINUOUS SIMULATION RESISTANCE
@@ -267,7 +266,7 @@ def qualitative_test(output_dir):
     resistance_ss_res = pd.read_csv('../model/output/resistant_cells.txt', header=None).values.flatten().tolist()
 
     # Execute plot
-    my_interface.plot(time_steps_ss_res, step_alive_ss_res, step_necrotic_ss_res, step_apoptotic_ss_res, pos_ss_res, resistance=True, stop_time=stop_time_ss_res, stop=True)
+    my_interface.plot(time_steps_ss_res, step_alive_ss_res, step_necrotic_ss_res, step_apoptotic_ss_res, pos_ss_res, resistance=True, stop_time=stop_time_ss_res)
 
     # create a variable to handle all the plots
 

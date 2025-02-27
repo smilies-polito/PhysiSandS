@@ -19,8 +19,9 @@ def time_plot(quantitative_test, output_folder):
     # getting times from the single simulation
     T_total_continuous = data1['T_total']
     T_total_continuous_mean = np.mean(T_total_continuous)
-    print(T_total_continuous_mean)
     T_total_continuous_std = np.std(T_total_continuous)
+    print(f"{T_total_continuous_mean} +- {T_total_continuous_std}")
+
 
     # getting times from the start and stop simulation
     T_save_ss = data1['T_save_ss']
@@ -29,10 +30,13 @@ def time_plot(quantitative_test, output_folder):
     T_main_ss = data1['T_main_ss']
     time_steps = [0, 150, 300, 450, 600, 750, 900, 1050, 1200, 1350, 1440]
 
+    # facciamo la somma di T_total_ss per ogni step di modo da ottenere il t_total di ogni simulazione
+    sum_T_total_ss = [sum(lst) for lst in T_total_ss]
+    print(f"{np.mean(sum_T_total_ss)} +- {np.std(sum_T_total_ss)}")
+
     mean_T_save, std_T_save = compute_mean_std(T_save_ss, 0)
     mean_T_reload, std_T_reload = compute_mean_std(T_reload_ss, 0)
     mean_T_total, std_T_total = compute_mean_std(T_total_ss, 0)
-    print(np.sum(mean_T_total))
     mean_T_main, std_T_main = compute_mean_std(T_main_ss, 0)
 
     # getting cells from the start and stop simulation
@@ -100,8 +104,8 @@ def time_plot_second(quantitative_test, output_folder):
     # getting times from the single simulation
     T_total_continuous = data1['T_total']
     T_total_continuous_mean = np.mean(T_total_continuous)
-    print(T_total_continuous_mean)
-    T_total_continuous_std = np.std(T_total_continuous)
+    T_total_continuous_std = np.std(T_total_continuous)    
+    print(f"{T_total_continuous_mean} +- {T_total_continuous_std}")
 
     # getting times from the start and stop simulation
     T_save_ss = data1['T_save_ss']
@@ -109,6 +113,9 @@ def time_plot_second(quantitative_test, output_folder):
     T_total_ss = data1['T_total_ss']
     T_main_ss = data1['T_main_ss']
     time_steps = [0, 600, 1200, 1800, 2400, 2880]
+
+    sum_T_total_ss = [sum(lst) for lst in T_total_ss]
+    print(f"{np.mean(sum_T_total_ss)} +- {np.std(sum_T_total_ss)}")
 
     mean_T_save, std_T_save = compute_mean_std(T_save_ss, 0)
     mean_T_reload, std_T_reload = compute_mean_std(T_reload_ss, 0)

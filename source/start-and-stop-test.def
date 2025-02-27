@@ -55,6 +55,6 @@ From: ubuntu:22.04
     python quantitative_test_second.py "$output_folder"
 
     # run the time plot
-    #cd ../helpers/plots
-    #python time_plot.py "$output_folder/quantitative_test.json" "$output_folder/quantitative_test_second.json" "$output_folder"
+    cd ../helpers/plots
+    python time_plot.py "$output_folder/quantitative_test.json" "$output_folder/quantitative_test_second.json" "$output_folder"
 

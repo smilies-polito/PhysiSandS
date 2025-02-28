@@ -193,10 +193,10 @@
 		
 		<start_stop type="bool" units="">false</start_stop>
 		<auto_stop type="bool" units="">false</auto_stop>
-		<auto_stop_resistance type="bool" units="">true</auto_stop_resistance>
+		<auto_stop_resistance type="bool" units="">false</auto_stop_resistance>
 
 		<if_start_inj type="bool" units="none">true</if_start_inj>
-		<tnf_pulse_period type="double" units="min">150</tnf_pulse_period> 
+		<tnf_pulse_period type="double" units="min">600</tnf_pulse_period> 
 		<tnf_pulse_duration type="double" units="min">10</tnf_pulse_duration> 
 		<tnf_pulse_concentration type="double" units="TNF/um^3">0.005</tnf_pulse_concentration> 
 		<time_remove_tnf type="double" units="min">999999</time_remove_tnf> 

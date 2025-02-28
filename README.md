@@ -1,6 +1,6 @@
 # Start and Stop Test
 Here you can find a guide to reproduce the results shown in the paper *"Start&Stop - a PhysiCell and PhysiBoSS 2.0 add-on for interactive simulation control"*.
-All code was developed and executed on a Linux Ubuntu 22.04.4 LTS (GNU/Linux 5.15.0-131-generic x86_64) operating system.
+All code was developed and executed on a Linux Ubuntu 22.04.4 LTS (GNU/Linux 5.15.0-131-generic x86_64) operating system and using Python3.10.
 In case of any issues reproducing the results or installing the dependencies, we provide a Singularity container and a tutorial on how to execute it.
 
 

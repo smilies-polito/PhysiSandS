@@ -20,7 +20,7 @@ From: ubuntu:22.04
     apt install git -y
 
     pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-    pip install --no-cache-dir numpy==1.26.3
+    pip install --no-cache-dir numpy==1.26.4
     pip install --no-cache-dir matplotlib==3.8.2
     pip install --no-cache-dir pandas==2.2.0
     pip install --no-cache-dir PyYAML==6.0.1

@@ -24,7 +24,7 @@
         "path": "user_parameters/if_start_inj"
     },
     "tnf_pulse_period": {
-        "value": 150,
+        "value": 600,
         "path": "user_parameters/tnf_pulse_period"
     },
     "tnf_pulse_duration": {
@@ -52,15 +52,15 @@
         "path": "user_parameters/seed_tnf"
     },
     "start_stop": {
-        "value": "true",
+        "value": "false",
         "path": "user_parameters/start_stop"
     },
     "auto_stop": {
-        "value": "true",
+        "value": "false",
         "path": "user_parameters/auto_stop"
     },
     "auto_stop_resistance": {
-        "value": "true",
+        "value": "false",
         "path": "user_parameters/auto_stop_resistance"
     }
 }

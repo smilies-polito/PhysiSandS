@@ -46,7 +46,14 @@ def test_start_and_stop(num_simu, step, two_D):
 
     for sim in range(num_simu):
 
-        time_steps_flag, step_alive_flag, step_necrotic_flag, step_apoptotic_flag, percentage_of_resistant, stable_cells = start_stop_simu(step, two_D)
+        success = False
+
+        while not success:
+            try:
+                time_steps_flag, step_alive_flag, step_necrotic_flag, step_apoptotic_flag, percentage_of_resistant, stable_cells = start_stop_simu(step, two_D)
+                success = True
+            except Exception as e:
+                time.sleep(1)
 
         times_df = pd.read_csv('output/interesting_times.txt', sep=' ', header=None)
         T_save_flag = times_df.iloc[:,0].values.tolist()
@@ -107,6 +114,7 @@ def test_start_and_stop_second(num_simu, step, two_D):
 
     data_to_plot_epithelial = []
     data_to_plot_mesenchymal = []
+    
 
     for i in stops:
         data_to_plot_epithelial.append([])
@@ -114,8 +122,14 @@ def test_start_and_stop_second(num_simu, step, two_D):
 
     for sim in range(num_simu):
         os.chdir(current_dir)
+        success = False
 
-        time_steps_flag, step_epithelial_flag, step_mesenchymal_flag = start_stop_simu_second(step, two_D)
+        while not success:
+            try:
+                time_steps_flag, step_epithelial_flag, step_mesenchymal_flag = start_stop_simu_second(step, two_D)
+                success = True
+            except Exception as e:
+                time.sleep(1)
 
         times_df = pd.read_csv('output/interesting_times.txt', sep=' ', header=None)
         T_save_flag = times_df.iloc[:,0].values.tolist()

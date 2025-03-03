@@ -1,6 +1,5 @@
 numpy==1.26.4
 matplotlib==3.8.2
-pandas==2.2.0
+pandas==2.2.3
 PyYAML==6.0.1
-scipy==1.12.0
 pctk==0.2.2

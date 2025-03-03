@@ -1,17 +1,22 @@
 # PhysiS&S
-Here you can find a guide to reproduce the results shown in the paper *"Start&Stop - a PhysiCell and PhysiBoSS 2.0 add-on for interactive simulation control"*.
-All code was developed and executed on a Linux Ubuntu 22.04.4 LTS (GNU/Linux 5.15.0-131-generic x86_64) operating system and using Python3.10.
-In case of any issues reproducing the results or installing the dependencies, we provide a Singularity container and a tutorial on how to execute it.
+This repository implements and tests the Start & Stop add-on for both PhysiCell and PhysiBoSS. This tool allows users to pause the simulation based on simulation time or predefined cell conditions. It enables them to save snapshots of the system state after pausing, and resume the simulation from a previously saved state.
+
+Here, you can find a guide to reproduce the results shown in the paper *"Start&Stop - a PhysiCell and PhysiBoSS 2.0 add-on for interactive simulation control"*.
+
+All code was developed and executed on a **Linux Ubuntu 22.04.4 LTS** (GNU/Linux 5.15.0-131-generic x86_64) operating system using **Python 3.10**.
+
+In case of any issues reproducing the results or installing the dependencies, we provide a **Singularity container** along with a tutorial on how to execute it.
+
 
 
 ## Installation Guide
 
 ### Clone the Repository
-First, clone the `PhysiS&S` repository in your home folder:
+First, clone the `PhysiSandS` repository in your home folder:
 
 ```bash
-git clone https://github.com/smilies-polito/PhysiS&S
-cd PhysiS&S
+git clone https://github.com/smilies-polito/PhysiSandS
+cd PhysiSandS
 ```
 
 ### Install Dependencies
@@ -74,19 +79,19 @@ Follow these steps to setup for reproducing the experiments provided in the pape
 	* Suggestion: follow instructions provided in _Download and install singularity from a release_ section after installing `Go`
 	* Install dependencies from: https://docs.sylabs.io/guides/main/admin-guide/installation.html
 
-2) Clone the PhysiS&S repository in your home folder
+2) Clone the PhysiSandS repository in your home folder
 ```
-git clone https://github.com/smilies-polito/PhysiS&S
+git clone https://github.com/smilies-polito/PhysiSandS
 ```
 
 3) Move to the source subfolder, and build the PhysiS&S Singularity container with 
 ```bash
-cd PhysiS&S/source
+cd PhysiSandS/source
 sudo singularity build PhysiS&S.sif PhysiS&S.def
 ```
 or using fake root privileges
 ```bash
-cd PhysiS&S/source
+cd PhysiSandS/source
 singularity build --fakeroot PhysiS&S.sif PhysiS&S.def
 ```
 
@@ -96,7 +101,7 @@ To run testing, manually launch the PhysiS&S Singularity container. Move to the 
 
 First of all, launch the PhysiS&S Singularity container
 ```bash
-cd PhysiS&S/source
+cd PhysiSandS/source
 singularity shell PhysiS&S.sif
 ```
 This will run a shell within the container, and the following prompt should appear:
@@ -151,8 +156,8 @@ To reproduce the analysis from this paper, run the Singularity container PhysiS&
 
 Move to the `source` folder and run the `PhysiS&S.sif` file
 ```bash
-cd PhysiS&S/source
-singularity run PhysiS&S.sif /path/to/your/output/folder/
+cd PhysiSandS/source
+singularity run PhysiSandS.sif /path/to/your/output/folder/
 ```
 ## Disclaimer
 

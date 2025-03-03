@@ -1,4 +1,4 @@
-# Start and Stop Test
+# PhysiS&S
 Here you can find a guide to reproduce the results shown in the paper *"Start&Stop - a PhysiCell and PhysiBoSS 2.0 add-on for interactive simulation control"*.
 All code was developed and executed on a Linux Ubuntu 22.04.4 LTS (GNU/Linux 5.15.0-131-generic x86_64) operating system and using Python3.10.
 In case of any issues reproducing the results or installing the dependencies, we provide a Singularity container and a tutorial on how to execute it.
@@ -7,11 +7,11 @@ In case of any issues reproducing the results or installing the dependencies, we
 ## Installation Guide
 
 ### Clone the Repository
-First, clone the `start-and-stop-test` repository in your home folder:
+First, clone the `PhysiS&S` repository in your home folder:
 
 ```bash
-git clone https://github.com/smilies-polito/start-and-stop-test
-cd start-and-stop-test
+git clone https://github.com/smilies-polito/PhysiS&S
+cd PhysiS&S
 ```
 
 ### Install Dependencies
@@ -56,8 +56,8 @@ cd ../test
 python quantitative_test_second.py /path/to/your/output/folder/
 ```
 
-### Computational Times comparison
-To save an image comparing the different execution times of continuous simulations and simulations with multiple stops and restarts, navigate to the helpers/plots folder and execute the time_plot.py script. Provide both JSON files containing the outputs of the quantitative tests and specify the output folder as follows.
+### Computational Time Comparison
+To generate images illustrating the CPU time overhead introduced by the Start & Stop add-on in the two quantitative tests, run the `time_plot.py` script. Pass as arguments the JSON files generated during the tests.
 ```bash
 cd ../helpers/plots
 python time_plot.py /path/to/your/quantitative_test.json /path/to/your/quantitative_test_second.json /path/to/your/output/folder/
@@ -74,30 +74,30 @@ Follow these steps to setup for reproducing the experiments provided in the pape
 	* Suggestion: follow instructions provided in _Download and install singularity from a release_ section after installing `Go`
 	* Install dependencies from: https://docs.sylabs.io/guides/main/admin-guide/installation.html
 
-2) Clone the start-and-stop-test repository in your home folder
+2) Clone the PhysiS&S repository in your home folder
 ```
-git clone https://github.com/smilies-polito/start-and-stop-test
+git clone https://github.com/smilies-polito/PhysiS&S
 ```
 
-3) Move to the source subfolder, and build the start-and-stop-test Singularity container with 
+3) Move to the source subfolder, and build the PhysiS&S Singularity container with 
 ```bash
-cd start-and-stop-test/source
-sudo singularity build start-and-stop-test.sif start-and-stop-test.def
+cd PhysiS&S/source
+sudo singularity build PhysiS&S.sif PhysiS&S.def
 ```
 or using fake root privileges
 ```bash
-cd start-and-stop-test/source
-singularity build --fakeroot start-and-stop-test.sif start-and-stop-test.def
+cd PhysiS&S/source
+singularity build --fakeroot PhysiS&S.sif PhysiS&S.def
 ```
 
-## Reproducing the analysis interactively within the start-and-stop-test Singularity container
+## Reproducing the analysis interactively within the PhysiS&S Singularity container
 
-To run testing, manually launch the start-and-stop-test Singularity container. Move to the `source` folder, and launch the scripts as follows.
+To run testing, manually launch the PhysiS&S Singularity container. Move to the `source` folder, and launch the scripts as follows.
 
-First of all, launch the start-and-stop-test Singularity container
+First of all, launch the PhysiS&S Singularity container
 ```bash
-cd start-and-stop-test/source
-singularity shell start-and-stop-test.sif
+cd PhysiS&S/source
+singularity shell PhysiS&S.sif
 ```
 This will run a shell within the container, and the following prompt should appear:
 ```bash
@@ -145,14 +145,14 @@ Singularity> cd ../helpers/plots
 Singularity>python time_plot.py /path/to/your/quantitative_test.json /path/to/your/quantitative_test_second.json /path/to/your/output/folder/
 ```
 
-## Reproducing the analysis running the start-and-stop-test Singularity container
+## Reproducing the analysis running the PhysiS&S Singularity container
 
-To reproduce the analysis from this paper, run the Singularity container start-and-stop-test.sif, specifying the output folder where you want the images to be saved.
+To reproduce the analysis from this paper, run the Singularity container PhysiS&S.sif, specifying the output folder where you want the images to be saved.
 
-Move to the `source` folder and run the `start-and-stop-test.sif` file
+Move to the `source` folder and run the `PhysiS&S.sif` file
 ```bash
-cd start-and-stop-test/source
-singularity run start-and-stop-test.sif /path/to/your/output/folder/
+cd PhysiS&S/source
+singularity run PhysiS&S.sif /path/to/your/output/folder/
 ```
 ## Disclaimer
 

@@ -119,12 +119,7 @@ int main( int argc, char* argv[] )
 	setup_microenvironment(); // modify this in the custom code 
 	
 	bool start_stop = parameters.bools("start_stop");
-	if( start_stop ){
-	
-		// reset microenvironment and cells as they were in the previous simulation
-		reset_microenv();
-	}
-	
+
 	/* PhysiCell setup */ 
  	
 	// set mechanics voxel size, and match the data structure to BioFVM
@@ -144,6 +139,8 @@ int main( int argc, char* argv[] )
 		//exit(-1);
 
 		reset_global_parameters(cell_container);
+
+		reset_microenv();
 
 	} else{
 		setup_tissue(); //death model index = 1 == necrotic...= 0 == apoptotic.

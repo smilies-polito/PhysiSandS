@@ -24,7 +24,7 @@
         "path": "user_parameters/if_start_inj"
     },
     "tnf_pulse_period": {
-        "value": 600,
+        "value": 150,
         "path": "user_parameters/tnf_pulse_period"
     },
     "tnf_pulse_duration": {

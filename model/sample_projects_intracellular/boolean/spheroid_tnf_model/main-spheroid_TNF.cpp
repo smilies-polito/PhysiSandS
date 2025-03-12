@@ -123,12 +123,6 @@ int main( int argc, char* argv[] )
 	setup_microenvironment(); // modify this in the custom code 
 
 	bool start_stop = parameters.bools("start_stop");
-	if( start_stop ){
-	
-		// reset microenvironment and cells as they were in the previous simulation
-		reset_microenv();
-	}
-
 
 	// User parameters
 	
@@ -171,6 +165,8 @@ int main( int argc, char* argv[] )
 		reset_global_parameters(cell_container);
 
 		update_variables_monitor();
+
+		reset_microenv();
 
 
 	} else{

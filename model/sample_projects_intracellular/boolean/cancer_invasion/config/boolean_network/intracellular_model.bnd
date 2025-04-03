@@ -96,7 +96,7 @@ Node optoSRC {
 
 // Directed interactions from Signor Adhesome
 Node SRC {
-  logic = (FAK | optoSRC | (FAK & optoSRC)) | SRC;
+  logic = (FAK | optoSRC | (FAK & optoSRC)) | ASN007;
   rate_up = @logic ? $u_SRC : 0.0;
   rate_down = @logic ? 0.0 : $d_SRC;
 }

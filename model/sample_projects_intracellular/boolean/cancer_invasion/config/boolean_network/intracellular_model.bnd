@@ -96,7 +96,7 @@ Node optoSRC {
 
 // Directed interactions from Signor Adhesome
 Node SRC {
-  logic = FAK | optoSRC | (FAK & optoSRC);
+  logic = (FAK | optoSRC | (FAK & optoSRC)) | SRC;
   rate_up = @logic ? $u_SRC : 0.0;
   rate_down = @logic ? 0.0 : $d_SRC;
 }
@@ -243,7 +243,7 @@ Node miR203 {
 
 // "Src-mediated phosphorylation of FAK at Tyr-925creates a SH2 binding site for the Grb2 adapter protein and has been connected to the activation of the extracellular signal regulated (ERK)/mitogen-activated protein (MAP) kinase pathway" from Christof R. Hauck et Al.
 Node ERK {
-  logic = ((SMAD | CDH2 | GF | NICD) & !AKT1);
+  logic = ((SMAD | CDH2 | GF | NICD) & !AKT1) & !ASN007;
   rate_up = @logic ? $u_ERK : 0.0;
   rate_down = @logic ? 0.0 : $d_ERK;
 }
@@ -273,9 +273,9 @@ Node VIM {
   rate_down = @logic ? 0.0 : $d_VIM;
 }
 
-// added the inibition by EMT_knockout
+// added the inibition by ASN007
 Node EMT {
-  logic = ((!CDH1 & CDH2) | EMT & (!CDH1 & CDH2)) & !EMT_knockout;
+  logic = ((!CDH1 & CDH2) | EMT & (!CDH1 & CDH2));
   rate_up = @logic ? $u_EMT : 0.0;
   rate_down = @logic ? 0.0 : $d_EMT;
 }
@@ -304,11 +304,11 @@ Node Apoptosis {
   rate_down = @logic ? 0.0 : $d_Apoptosis;
 }
 
-// added our EMT_knockout node
-Node EMT_knockout {
+// added our ASN007 node
+Node ASN007 {
   logic = 0;
-  rate_up = $u_EMT_knockout;
-  rate_down = $d_EMT_knockout;
+  rate_up = $u_ASN007;
+  rate_down = $d_ASN007;
 }
 
 

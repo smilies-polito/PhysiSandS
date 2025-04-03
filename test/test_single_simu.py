@@ -128,7 +128,7 @@ def test_single_simu_second(num_simu, step, two_D, resistance=False):
     parameter_dict['start_stop']['value'] = 'false'
     parameter_dict['initial_conditions']['value'] = './config'
     parameter_dict['auto_stop']['value'] = 'false'
-    parameter_dict['EMT_knockout']['value'] = 'false'
+    parameter_dict['ASN007']['value'] = 'false'
 
     with open(json_file_path, 'w') as file:
         json.dump(parameter_dict, file, indent=4)
@@ -164,3 +164,11 @@ def test_single_simu_second(num_simu, step, two_D, resistance=False):
             n+=1
 
     return data_to_plot_epithelial, data_to_plot_mesenchymal, T_save, T_reload, T_total, T_main
+
+if __name__ == '__main__':
+    # Test the function
+    num_simu = 1
+    step = 5
+    two_D = True
+
+    data_to_plot_epithelial, data_to_plot_mesenchymal, T_save_second, T_reload_second, T_total_second, T_main_second = test_single_simu_second(num_simu, step, two_D)

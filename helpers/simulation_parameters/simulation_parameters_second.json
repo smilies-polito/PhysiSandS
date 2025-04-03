@@ -16,19 +16,19 @@
         "path": "overall/max_time"
     },
     "start_stop": {
-        "value": "false",
+        "value": "true",
         "path": "user_parameters/start_stop"
     },
     "initial_conditions": {
-        "value": "./config",
+        "value": "./start_and_stop_saving_files",
         "path": "initial_conditions/cell_positions/folder"
     },
     "auto_stop": {
         "value": "false",
         "path": "user_parameters/auto_stop"
     },
-    "EMT_knockout": {
-        "value": "false",
-        "path": "user_parameters/EMT_knockout"
+    "ASN007": {
+        "value": "true",
+        "path": "user_parameters/ASN007"
     }
 }

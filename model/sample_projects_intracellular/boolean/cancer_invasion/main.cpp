@@ -130,7 +130,6 @@ int main( int argc, char* argv[] )
 	setup_microenvironment(); // modify this in the custom code 
 
 	bool start_stop = parameters.bools("start_stop");
-	bool ASN007 = parameters.bools("ASN007");
 	
 	/* PhysiCell setup */ 
  	
@@ -162,9 +161,6 @@ int main( int argc, char* argv[] )
 		setup_tissue(); //death model index = 1 == necrotic...= 0 == apoptotic.
 	}
 
-	if( ASN007){
-		ASN007_function();
-	}
 	/* Users typically stop modifying here. END USERMODS */ 
 	
 	// set MultiCellDS save options 

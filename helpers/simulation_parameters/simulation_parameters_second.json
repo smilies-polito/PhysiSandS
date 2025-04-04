@@ -27,8 +27,12 @@
         "value": "false",
         "path": "user_parameters/auto_stop"
     },
-    "ASN007": {
-        "value": "true",
-        "path": "user_parameters/ASN007"
+    "SRC_bnd": {
+        "value": "config/boolean_network/intracellular_model_SRC.bnd",
+        "path": "cell_definitions/cell_definition/phenotype/intracellular/bnd_filename"
+    },
+    "SRC_cfg": {
+        "value": "config/boolean_network/intracellular_model_SRC.cfg",
+        "path": "cell_definitions/cell_definition/phenotype/intracellular/cfg_filename"
     }
 }

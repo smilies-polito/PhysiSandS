@@ -56,15 +56,27 @@ class interface:
         parameters = list(self.parameter_dict.keys())
         
         for param in parameters:
-            # Find parameter tags
             tags = self.parameter_dict[param]['path'].split('/')
-            
-            # Find tag to modify
+            new_value = str(self.parameter_dict[param]['value'])
+
+            # CASO SPECIALE: aggiorna tutti i cell_definition/intracellular/...
+            if tags[:3] == ['cell_definitions', 'cell_definition', 'phenotype'] and tags[3] == 'intracellular':
+                target_tag = tags[-1]  # es: bnd_filename o cfg_filename
+                for cd in root.findall('.//cell_definition'):
+                    phenotype = cd.find('phenotype')
+                    if phenotype is not None:
+                        intracellular = phenotype.find('intracellular')
+                        if intracellular is not None:
+                            target_element = intracellular.find(target_tag)
+                            if target_element is not None:
+                                target_element.text = new_value
+                continue  # salta il resto del loop per questo parametro
+
+            # Altrimenti: gestione standard
             element = root
             for tag in tags:
                 if element is not None:
                     if tag == 'variable' and 'name' in self.parameter_dict[param]:
-                        # Find the variable with the specific name
                         found = False
                         for var in element.findall(tag):
                             if var.attrib['name'] == self.parameter_dict[param]['name']:
@@ -76,21 +88,20 @@ class interface:
                             break
                     elif tag != 'variable':
                         element = element.find(tag)
-                
-            #Update the value
-            new_value = str(self.parameter_dict[param]['value'])
 
             if element is not None:
                 element.text = new_value
 
-            # Save XML file
-            tree.write(physicell_setting_file)
-            
+        # Salva il file alla fine
+        tree.write(physicell_setting_file)
+        
         return 'Settings updated succesfully!'
+
+
 
     def update_parameters_second(self, iteration):
         
-        # File path for the physicell settings
+        # File path for the Physicell settings
         if iteration == 0:
             physicell_setting_file = os.path.join(self.root_dir, 'model/sample_projects_intracellular/boolean/cancer_invasion/config/PhysiCell_settings.xml')
         else:
@@ -104,15 +115,29 @@ class interface:
         parameters = list(self.parameter_dict.keys())
         
         for param in parameters:
-            # Find parameter tags
             tags = self.parameter_dict[param]['path'].split('/')
-            
-            # Find tag to modify
+            new_value = str(self.parameter_dict[param]['value'])
+
+            # CASO SPECIALE: aggiorna tutti i cell_definition/intracellular/...
+            if tags[:3] == ['cell_definitions', 'cell_definition', 'phenotype'] and tags[3] == 'intracellular':
+                target_tag = tags[-1]  # es: bnd_filename o cfg_filename
+
+                for cell_defs in root.findall('.//cell_definitions'):
+                    for cd in cell_defs.findall('cell_definition'):
+                        phenotype = cd.find('phenotype')
+                        if phenotype is not None:
+                            intracellular = phenotype.find('intracellular')
+                            if intracellular is not None:
+                                target_element = intracellular.find(target_tag)
+                                if target_element is not None:
+                                    target_element.text = new_value
+                continue  # salta il resto del loop per questo parametro
+
+            # Gestione standard per gli altri path
             element = root
             for tag in tags:
                 if element is not None:
                     if tag == 'variable' and 'name' in self.parameter_dict[param]:
-                        # Find the variable with the specific name
                         found = False
                         for var in element.findall(tag):
                             if var.attrib['name'] == self.parameter_dict[param]['name']:
@@ -124,17 +149,15 @@ class interface:
                             break
                     elif tag != 'variable':
                         element = element.find(tag)
-                
-            #Update the value
-            new_value = str(self.parameter_dict[param]['value'])
 
             if element is not None:
                 element.text = new_value
 
-            # Save XML file
-            tree.write(physicell_setting_file)
-            
+        # Salva il file alla fine
+        tree.write(physicell_setting_file)
+        
         return 'Settings updated succesfully!'
+
     
     def execute_simulation(self, iteration):
         # Change current working directory

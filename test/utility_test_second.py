@@ -85,7 +85,8 @@ def qualitative_test(output_dir):
     parameter_dict['start_stop']['value'] = 'false'
     parameter_dict['auto_stop']['value'] = 'false'
     parameter_dict['initial_conditions']['value'] = './config'
-    parameter_dict['ASN007']['value'] = 'false'
+    parameter_dict['SRC_cfg']['value'] = "config/boolean_network/intracellular_model.cfg"
+    parameter_dict['SRC_bnd']['value'] = "config/boolean_network/intracellular_model.bnd"
 
     #update the json file
     with open(json_file_path, 'w') as file:
@@ -129,7 +130,8 @@ def qualitative_test(output_dir):
     conversion(my_interface.output_folder, my_interface.Start_Stop_folder)
     parameter_dict['initial_conditions']['value'] = './start_and_stop_saving_files'
     parameter_dict['auto_stop']['value'] = 'false'
-    parameter_dict['ASN007']['value'] = 'true'
+    parameter_dict['SRC_cfg']['value'] = "config/boolean_network/intracellular_model_SRC.cfg"
+    parameter_dict['SRC_bnd']['value'] = "config/boolean_network/intracellular_model_SRC.bnd"
 
     #update the json file
     with open(json_file_path, 'w') as file:

@@ -400,21 +400,6 @@ std::string my_coloring_function_for_stroma( double concentration, double max_co
 
 }
 
-void ASN007_function(){
-
-	for (int i = 0; i < (*all_cells).size(); i++)
-	{
-		std::string node_name = "ASN007";
-		bool node_value = true;
-		// Access the current cell
-		Cell *pCell = (*all_cells)[i];
-		pCell->phenotype.intracellular->set_boolean_variable_value(node_name, node_value);
-	}
-
-	return;
-
-}
-
 bool auto_stop() {
 
 	bool condition = false;

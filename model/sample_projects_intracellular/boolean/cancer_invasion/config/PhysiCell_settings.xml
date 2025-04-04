@@ -672,7 +672,6 @@
     <user_parameters>
     	<start_stop type="bool" units="">false</start_stop>
         <auto_stop type="bool" units="">true</auto_stop>
-        <ASN007 type="bool" units="" description="set to true to inhibit EMT">false</ASN007>
 
         <random_seed type="int" units="dimensionless" description="">0</random_seed>
         <tumor_radius type="double" units="micron" description="">30.0</tumor_radius>

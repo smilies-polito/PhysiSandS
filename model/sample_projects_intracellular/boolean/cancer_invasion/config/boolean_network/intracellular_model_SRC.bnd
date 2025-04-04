@@ -96,7 +96,7 @@ Node optoSRC {
 
 // Directed interactions from Signor Adhesome
 Node SRC {
-  logic = FAK | optoSRC | (FAK & optoSRC);
+  logic = (FAK | optoSRC | (FAK & optoSRC)) | SRC | !SRC;
   rate_up = @logic ? $u_SRC : 0.0;
   rate_down = @logic ? 0.0 : $d_SRC;
 }
@@ -274,7 +274,7 @@ Node VIM {
 }
 
 Node EMT {
-  logic = (!CDH1 & CDH2) | EMT & (!CDH1 & CDH2) ;
+  logic = ((!CDH1 & CDH2) | EMT & (!CDH1 & CDH2));
   rate_up = @logic ? $u_EMT : 0.0;
   rate_down = @logic ? 0.0 : $d_EMT;
 }
@@ -302,5 +302,3 @@ Node Apoptosis {
   rate_up = @logic ? $u_Apoptosis : 0.0;
   rate_down = @logic ? 0.0 : $d_Apoptosis;
 }
-
-

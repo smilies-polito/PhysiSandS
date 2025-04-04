@@ -128,7 +128,8 @@ def test_single_simu_second(num_simu, step, two_D, resistance=False):
     parameter_dict['start_stop']['value'] = 'false'
     parameter_dict['initial_conditions']['value'] = './config'
     parameter_dict['auto_stop']['value'] = 'false'
-    parameter_dict['ASN007']['value'] = 'false'
+    parameter_dict['SRC_cfg']['value'] = "config/boolean_network/intracellular_model.cfg"
+    parameter_dict['SRC_bnd']['value'] = "config/boolean_network/intracellular_model.bnd"
 
     with open(json_file_path, 'w') as file:
         json.dump(parameter_dict, file, indent=4)

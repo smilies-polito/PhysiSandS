@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">150</max_time>
+		<max_time units="min">1440</max_time>
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 		<dt_diffusion units="min">0.02</dt_diffusion>
@@ -149,8 +149,8 @@
 				<molecular />
 
 				<intracellular type="maboss">
-					<bnd_filename>config/boolean_network/intracellular_model_SRC.bnd</bnd_filename>
-					<cfg_filename>config/boolean_network/intracellular_model_SRC.cfg</cfg_filename>
+					<bnd_filename>./config/TNF_nodes.bnd</bnd_filename>
+					<cfg_filename>./config/TNF_conf.cfg</cfg_filename>
 					<settings>
 						<intracellular_dt>10.0</intracellular_dt>
 						<time_stochasticity>0.01</time_stochasticity>

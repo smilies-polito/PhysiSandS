@@ -16,11 +16,11 @@
         "path": "overall/max_time"
     },
     "start_stop": {
-        "value": "true",
+        "value": "false",
         "path": "user_parameters/start_stop"
     },
     "initial_conditions": {
-        "value": "./start_and_stop_saving_files",
+        "value": "./config",
         "path": "initial_conditions/cell_positions/folder"
     },
     "auto_stop": {
@@ -28,11 +28,11 @@
         "path": "user_parameters/auto_stop"
     },
     "SRC_bnd": {
-        "value": "config/boolean_network/intracellular_model_SRC.bnd",
+        "value": "config/boolean_network/intracellular_model.bnd",
         "path": "cell_definitions/cell_definition/phenotype/intracellular/bnd_filename"
     },
     "SRC_cfg": {
-        "value": "config/boolean_network/intracellular_model_SRC.cfg",
+        "value": "config/boolean_network/intracellular_model.cfg",
         "path": "cell_definitions/cell_definition/phenotype/intracellular/cfg_filename"
     }
 }

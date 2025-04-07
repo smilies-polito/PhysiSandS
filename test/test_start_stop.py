@@ -111,7 +111,7 @@ def test_start_and_stop_second(num_simu, step, two_D):
             current_time += step
         else: 
             stops.append(duration)
-
+    print('hereee')
     data_to_plot_epithelial = []
     data_to_plot_mesenchymal = []
     
@@ -126,6 +126,7 @@ def test_start_and_stop_second(num_simu, step, two_D):
 
         while not success:
             try:
+                print('hereee')
                 time_steps_flag, step_epithelial_flag, step_mesenchymal_flag = start_stop_simu_second(step, two_D)
                 success = True
             except Exception as e:

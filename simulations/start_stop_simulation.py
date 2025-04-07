@@ -79,7 +79,8 @@ def start_stop_simu_second(step, two_D):
     
     # disable auto stop and EMT_knockout, not usefull for this simulation
     my_interface.parameter_dict['auto_stop']['value'] = 'false'
-    my_interface.parameter_dict['EMT_knockout']['value'] = 'false'
+    my_interface.parameter_dict['SRC_cfg']['value'] = "config/boolean_network/intracellular_model.cfg"
+    my_interface.parameter_dict['SRC_bnd']['value'] = "config/boolean_network/intracellular_model.bnd"
 
     # define current time
     current_time = 0

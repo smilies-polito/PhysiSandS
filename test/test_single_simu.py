@@ -144,7 +144,14 @@ def test_single_simu_second(num_simu, step, two_D, resistance=False):
     for sim in range(num_simu):
         if sim != 0:
             os.chdir('..')
-        time_steps_flag, step_epithelial_flag, step_mesenchymal_flag = single_simu_second(two_D)
+        success = False
+
+        while not success:
+            try:
+                time_steps_flag, step_epithelial_flag, step_mesenchymal_flag = single_simu_second(two_D)
+                success = True
+            except Exception as e:
+                time.sleep(1)
         times_df = pd.read_csv('output/interesting_times.txt', sep=' ', header=None)
         T_save.append(times_df.iloc[0, 0])
         T_reload.append(times_df.iloc[0, 1])

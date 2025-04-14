@@ -5,7 +5,7 @@ Here, you can find a guide to reproduce the results shown in the paper *"Start&S
 
 All code was developed and executed on a **Linux Ubuntu 22.04.4 LTS** (GNU/Linux 5.15.0-131-generic x86_64) operating system using **Python 3.10**.
 
-In case of any issues reproducing the results or installing the dependencies, we provide a **Singularity container** along with a tutorial on how to execute it.
+In case of any issues reproducing the results or installing the dependencies, we provide a **Singularity container** and a **Docker container** along with a tutorial on how to execute them.
 
 
 
@@ -159,6 +159,23 @@ Move to the `source` folder and run the `PhysiS&S.sif` file
 cd PhysiSandS/source
 singularity run PhysiSandS.sif /path/to/your/output/folder/
 ```
+
+## Docker
+To reproduce the analysis from this paper, you can also build and run a Docker container following these steps:.
+
+Move to the `source` folder and  build the Docker.
+```bash
+cd PhysiSandS/source
+docker build -t physi_container .
+```
+Execute the container:
+```bash
+docker run --rm \
+  -v $(pwd)/..:/workspace \
+  -v /absolute/path/to/your/output/folder:/output \
+  physi_container /output
+```
+
 ## Disclaimer
 
 Although the images used in the paper were generated in this same way, they may slightly differ from those produced by running these commands due to the high degree of randomness inherent in the simulator.

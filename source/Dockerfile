@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 ENV TZ=Europe/Rome
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Imposta il timezone
+# Installazioni
 RUN ln -fs /usr/share/zoneinfo/Europe/Rome /etc/localtime && \
     apt update -y && \
     apt upgrade -y && \
@@ -24,23 +24,21 @@ RUN ln -fs /usr/share/zoneinfo/Europe/Rome /etc/localtime && \
         scipy==1.12.0 \
         pctk==0.2.2
 
-# Copia tutto il contenuto nella cartella di lavoro
-WORKDIR /app
-COPY . .
+WORKDIR /workspace
 
-# Comando di default (equivalente al %runscript)
+# ENTRYPOINT corretto con gestione di argomento $0
 ENTRYPOINT ["bash", "-c", "\
 if [ -z \"$1\" ]; then \
-    echo 'Error: output folder missing'; \
-    echo 'usage: docker run image_name /path/to/your/output/folder'; \
-    exit 1; \
+  echo 'Error: output folder missing'; \
+  echo 'Usage: docker run image_name /path/to/output'; \
+  exit 1; \
 fi && \
-output_folder=$(realpath \"$1\") && \
-cd ../test && \
+output_folder=\"$1\" && \
+cd /workspace/test && \
 python utility_test.py \"$output_folder\" && \
 python quantitative_test.py \"$output_folder\" && \
 python utility_test_second.py \"$output_folder\" && \
 python quantitative_test_second.py \"$output_folder\" && \
-cd ../helpers/plots && \
+cd /workspace/helpers/plots && \
 python time_plot.py \"$output_folder/quantitative_test.json\" \"$output_folder/quantitative_test_second.json\" \"$output_folder\" \
-"]
+", "bash"]

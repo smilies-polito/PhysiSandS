@@ -166,11 +166,11 @@ To reproduce the analysis from this paper, you can also build and run a Docker c
 Move to the `source` folder and  build the Docker.
 ```bash
 cd PhysiSandS/source
-docker build -t physi_container .
+sudo docker build -t physi_container .
 ```
 Execute the container:
 ```bash
-docker run --rm \
+sudo docker run --rm \
   -v $(pwd)/..:/workspace \
   -v /absolute/path/to/your/output/folder:/output \
   physi_container /output
